@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/mat-commander.iml" filepath="$PROJECT_DIR$/mat-commander.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mat-commander-server/mat-commander-server.iml" filepath="$PROJECT_DIR$/mat-commander-server/mat-commander-server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mat-commander-ui/mat-commander-ui.iml" filepath="$PROJECT_DIR$/mat-commander-ui/mat-commander-ui.iml" />
     </modules>
   </component>
 </project>
