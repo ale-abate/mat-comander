@@ -22,8 +22,10 @@
       </button>
       <span>mat-commander-ui</span>
     </mat-toolbar>
+    <mat-progress-bar [mode]="(showProgressBar$ | async) ? 'indeterminate' : 'determinate' " value="0"> </mat-progress-bar>
 
-    <router-outlet></router-outlet>
-
+    <div class="main-content">
+      <router-outlet></router-outlet>
+    </div>
   </mat-sidenav-content>
 </mat-sidenav-container>

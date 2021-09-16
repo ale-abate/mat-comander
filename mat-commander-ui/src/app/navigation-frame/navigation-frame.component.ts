@@ -2,12 +2,13 @@ import { Component } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
-import {DirectoryService} from '../directory-service';
+import {DirectoryService} from '../services/directory-service';
+import {LoaderService} from '../services/loader.service';
 
 @Component({
   selector: 'app-navigation-frame',
   templateUrl: './navigation-frame.component.html',
-  styleUrls: ['./navigation-frame.component.css']
+  styleUrls: ['./navigation-frame.component.scss']
 })
 export class NavigationFrameComponent {
 
@@ -17,14 +18,14 @@ export class NavigationFrameComponent {
       shareReplay()
     );
 
-  constructor(private breakpointObserver: BreakpointObserver, private directoryService : DirectoryService ) {
+  public showProgressBar$: Observable<Boolean>;
+
+  constructor(private breakpointObserver: BreakpointObserver ,
+             private  loaderService: LoaderService) {
+
+      this.showProgressBar$ = loaderService.isLoading.asObservable();
   }
 
-  public list : string[] = []
 
-  test() {
 
-    this.directoryService.listDir().subscribe( l => this.list=l)
-
-  }
 }

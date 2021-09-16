@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"path"
@@ -19,7 +18,7 @@ func main() {
 	myRouter.HandleFunc("/{!(api)}", serveTemplate)
 	myRouter.HandleFunc("/api/hola", processHola)
 	myRouter.HandleFunc("/api/hola/{id}", processHola)
-	myRouter.HandleFunc("/api/dir", processDir)
+	myRouter.HandleFunc("/api/dir", getDirectoryList)
 	myRouter.HandleFunc("/api/config/preferences", updateConfigPreferences).Methods("POST")
 	myRouter.HandleFunc("/api/config/preferences", getConfigPreferences).Methods("GET")
 
@@ -85,21 +84,4 @@ func processHola(w http.ResponseWriter, r *http.Request) {
 		Article{Title: "Hello 2", Desc: "Article Description", Content: "Article Content"},
 	}
 	json.NewEncoder(w).Encode(Articles)
-}
-
-func processDir(w http.ResponseWriter, r *http.Request) {
-
-	files, err := ioutil.ReadDir("c:/")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	var fileNames []string
-
-	for _, f := range files {
-		fmt.Println(f.Name())
-		fileNames = append(fileNames, f.Name())
-	}
-
-	json.NewEncoder(w).Encode(fileNames)
 }

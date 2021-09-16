@@ -9,8 +9,9 @@ import (
 )
 
 type Configuration struct {
-	LeftFolder  string `json:"left-folder"`
-	RightFolder string `json:"right-folder"`
+	LeftFolder              string `json:"leftFolder"`
+	RightFolder             string `json:"rightFolder"`
+	RememberLastUsedFolders bool   `json:"rememberLastUsedFolders"`
 }
 
 func getConfigPreferences(w http.ResponseWriter, r *http.Request) {

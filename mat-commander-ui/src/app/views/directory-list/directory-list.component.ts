@@ -7,7 +7,7 @@ import { DirectoryListDataSource, DirectoryListItem } from './directory-list-dat
 @Component({
   selector: 'app-directory-list',
   templateUrl: './directory-list.component.html',
-  styleUrls: ['./directory-list.component.css']
+  styleUrls: ['./directory-list.component.scss']
 })
 export class DirectoryListComponent implements AfterViewInit {
   @ViewChild(MatSort) sort!: MatSort;

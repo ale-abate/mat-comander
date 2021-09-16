@@ -5,7 +5,7 @@ import { Breakpoints, BreakpointObserver } from '@angular/cdk/layout';
 @Component({
   selector: 'app-tools',
   templateUrl: './tools.component.html',
-  styleUrls: ['./tools.component.css']
+  styleUrls: ['./tools.component.scss']
 })
 export class ToolsComponent {
   /** Based on the screen size, switch from standard to one column per row */
