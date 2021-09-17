@@ -16,7 +16,7 @@ type McFile struct {
 }
 
 type McDirFilter struct {
-	path string
+	Path string `json:"path"`
 }
 
 func getDirectoryList(w http.ResponseWriter, r *http.Request) {
@@ -31,11 +31,11 @@ func getDirectoryList(w http.ResponseWriter, r *http.Request) {
 func doDirectoryList(filter *McDirFilter) []McFile {
 	var result []McFile
 
-	if strings.Trim(filter.path, " ") == "" {
-		filter.path = "."
+	if strings.Trim(filter.Path, " ") == "" {
+		filter.Path = "."
 	}
 
-	files, err := ioutil.ReadDir(filter.path)
+	files, err := ioutil.ReadDir(filter.Path)
 	if err != nil {
 		log.Println(err)
 	}

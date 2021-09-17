@@ -10,12 +10,10 @@ export class LoaderService {
   constructor() { }
 
   show() {
-    console.log('show')
     timer(10).subscribe(() => this.isLoading.next(true));
   }
 
   hide() {
-    console.log('hide')
     timer(10).subscribe(() => this.isLoading.next(false));
   }
 

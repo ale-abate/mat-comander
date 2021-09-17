@@ -1,17 +1,16 @@
-import {AfterViewInit, Component, Input, ViewChild} from '@angular/core';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatTable } from '@angular/material/table';
+import {AfterViewInit, Component, Input, OnDestroy, ViewChild} from '@angular/core';
+import {MatSort} from '@angular/material/sort';
+import {MatTable} from '@angular/material/table';
 import {DirectoryService, McFile} from '../../services/directory-service';
 import {DirectoryListDataSource} from './directory-list-datasource';
-import {Observable, of} from 'rxjs';
+import {CommandCenterService} from '../../services/command-center.service';
 
 @Component({
   selector: 'app-directory-list',
   templateUrl: './directory-list.component.html',
   styleUrls: ['./directory-list.component.scss']
 })
-export class DirectoryListComponent implements AfterViewInit {
+export class DirectoryListComponent implements   AfterViewInit, OnDestroy {
 
   @Input('name') name: string = "";
 
@@ -22,17 +21,39 @@ export class DirectoryListComponent implements AfterViewInit {
 
   displayedColumns = ['name', 'size'];
 
-  constructor(private directoryService: DirectoryService) {
+  constructor(private ccs: CommandCenterService) {
 
-      this.dataSource = new DirectoryListDataSource();
+    this.dataSource = new DirectoryListDataSource();
   }
 
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
     this.table.dataSource = this.dataSource;
+
+    console.log('init list', this.name)
+
+
+    this.ccs.onDirectoryChanged(this.name)
+      .subscribe(
+        f => {
+          console.log('dir ');
+          this.refresh()
+        }
+      );
+    this.ccs.OnContentDirectoryChanged(this.name).subscribe(
+      f => {
+        console.log('dir content')
+        this.dataSource.refresh(f)
+      }
+    );
+
+
   }
 
   refresh() {
-    this.directoryService.listDir( {}).subscribe( f => this.dataSource.refresh(f) );
+    this.ccs.refreshDirectoryList(this.name);
+  }
+
+  ngOnDestroy(): void {
   }
 }

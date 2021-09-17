@@ -1,3 +1,33 @@
+@import '../../../assets/styles/variables.scss';
+
+
+.container {
+  height: calc(100vh -   #{$top-bar-size} );
+}
+
+
+.left-col{
+  float: left;
+  width: 50%;
+  background: red;
+  height: 100%;
+  overflow: auto;
+  box-sizing: border-box;
+  padding: $pad-col;
+}
+
+.right-col{
+  float: left;
+  width: 50%;
+  background: blue;
+  height: 100%;
+  overflow: auto;
+  box-sizing: border-box;
+  padding: $pad-col;
+
+}
+
+
 .full-width-table {
   width: 100%;
 }

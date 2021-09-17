@@ -47,7 +47,6 @@ export class DirectoryListDataSource extends DataSource<McFile> {
    * this would be replaced by requesting the appropriate data from the server.
    */
   private getSortedData(data: McFile[]  ): McFile[] {
-    console.log('sort', this.sort)
 
     if (!this.sort || !this.sort.active || this.sort.direction === '') {
       return data;
