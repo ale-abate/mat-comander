@@ -11,7 +11,7 @@ export interface McFile {
 }
 
 export interface  McDirFilter  {
-  path : string ;
+  path?: string ;
 }
 
 

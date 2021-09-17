@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 
 @Component({
   selector: 'app-two-lists',
@@ -6,6 +6,8 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./two-lists.component.scss']
 })
 export class TwoListsComponent implements OnInit {
+
+
 
   constructor() { }
 

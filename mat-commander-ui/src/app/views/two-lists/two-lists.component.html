@@ -1,10 +1,13 @@
-<table class="full-width-table">
-  <tr>
-    <td>
-      <app-directory-list></app-directory-list>
-    </td>
-    <td>
-      <app-directory-list></app-directory-list>
-    </td>
-  </tr>
-</table>
+<div style="display: flex;align-items: flex-start ; flex-direction: row ;" >
+  <div style="flex-grow:1; margin: 5px" >
+    <app-directory-list [name]="'left'"></app-directory-list>
+  </div>
+  <div style="margin: 5px"> xxx </div>
+  <div  style="flex-grow:1; margin: 5px; ">
+
+    <app-directory-list [name]="'right'"></app-directory-list>
+  </div>
+
+</div>
+
+
