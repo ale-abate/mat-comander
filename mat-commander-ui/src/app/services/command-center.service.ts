@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {DirectoryService, McFile} from './directory-service';
 import {BehaviorSubject, Observable, Subject} from 'rxjs';
 import {Configuration, PreferencesService} from './preferences.service';
@@ -6,6 +6,8 @@ import {map} from 'rxjs/operators';
 
 
 export interface AppStatus {
+  currentName?: string;
+  currentFolder?: McFile;
   currentLeftFolder? : McFile;
   currentRightFolder? : McFile;
 }
@@ -28,6 +30,12 @@ export class CommandCenterService {
     "left" : new Subject<McFile[]>(),
     "right" : new Subject<McFile[]>(),
   }
+  private directoryFocusChanged  =  {
+    "left" : new BehaviorSubject<boolean>(false),
+    "right" : new BehaviorSubject<boolean>(false),
+  }
+
+
 
   onDirectoryChanged(name: string) : Observable<McFile>   {
     return this.isLeft(name) ? this.directoryChanged.left.asObservable() : this.directoryChanged.right.asObservable();
@@ -36,6 +44,11 @@ export class CommandCenterService {
   OnContentDirectoryChanged(name: string) : Observable<McFile[]>   {
     return this.isLeft(name) ? this.directoryContentChanged.left.asObservable() : this.directoryContentChanged.right.asObservable();
   }
+
+  OnDirectoryFocus(name: string) : Observable<boolean>   {
+    return this.isLeft(name) ? this.directoryFocusChanged.left.asObservable() : this.directoryFocusChanged.right.asObservable();
+  }
+
 
   constructor( private directoryService : DirectoryService, private preferencesService: PreferencesService ) {
   }
@@ -50,9 +63,12 @@ export class CommandCenterService {
 
   private prepareAppStatus(conf: Configuration) :AppStatus {
     this.appStatus = {
+      currentName: "left",
       currentLeftFolder: { name: conf.leftFolder as string, dir: true, ext: '', size: 0},
       currentRightFolder: { name: conf.rightFolder as string, dir: true, ext: '', size: 0},
     };
+
+    this.appStatus.currentFolder = this.appStatus.currentLeftFolder;
 
     console.log('status ready')
 
@@ -84,5 +100,15 @@ export class CommandCenterService {
 
   private isLeft(name: string):boolean {
     return name == "left";
+  }
+
+  requestFocus(name: string) {
+    const left =  this.isLeft(name) ;
+    if(this.appStatus) {
+      this.appStatus.currentName = name;
+    }
+
+    this.directoryFocusChanged.left.next(left);
+    this.directoryFocusChanged.right.next(!left);
   }
 }

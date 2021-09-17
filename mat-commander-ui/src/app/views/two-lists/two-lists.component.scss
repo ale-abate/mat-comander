@@ -1,33 +1,63 @@
+@use "sass:math";
 @import '../../../assets/styles/variables.scss';
+
+$center-col-width: 4%;
+$pad-col: 0.4em;
 
 
 .container {
-  height: calc(100vh -   #{$top-bar-size} );
+  height: calc(100vh -  ( #{$top-bar-size}  +  #{$button-bar-size}  + #{$bottom-bar-size} + 5px)   );
+}
+
+.left-toolbar, .right-toolbar {
+  float: left;
+  width: 50%;
 }
 
 
-.left-col{
+
+mat-toolbar {
+  height: $button-bar-size;
+}
+
+.right-toolbar mat-toolbar {
+  padding-left: $center-col-width ;
+}
+
+
+.center-col {
   float: left;
-  width: 50%;
-  background: red;
+  max-width: $center-col-width;
+  //height: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+  padding: $pad-col;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.left-col, .right-col {
+  float: left;
+  width: math.div(100% - $center-col-width, 2);
   height: 100%;
   overflow: auto;
   box-sizing: border-box;
-  padding: $pad-col;
+  padding-top: 0;
+  padding-right: $pad-col;
+  bottom: $pad-col;
+  padding-left: $pad-col;
 }
 
-.right-col{
-  float: left;
-  width: 50%;
-  background: blue;
-  height: 100%;
-  overflow: auto;
-  box-sizing: border-box;
-  padding: $pad-col;
-
+.left-col {
+  direction:rtl;
 }
 
 
-.full-width-table {
-  width: 100%;
+
+.bottom-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  height: $bottom-bar-size;
 }

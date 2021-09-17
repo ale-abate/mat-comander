@@ -1,9 +1,10 @@
 import {AfterViewInit, Component, Input, OnDestroy, ViewChild} from '@angular/core';
 import {MatSort} from '@angular/material/sort';
 import {MatTable} from '@angular/material/table';
-import {DirectoryService, McFile} from '../../services/directory-service';
+import {McFile} from '../../services/directory-service';
 import {DirectoryListDataSource} from './directory-list-datasource';
 import {CommandCenterService} from '../../services/command-center.service';
+import {Observable, of} from 'rxjs';
 
 @Component({
   selector: 'app-directory-list',
@@ -19,7 +20,8 @@ export class DirectoryListComponent implements   AfterViewInit, OnDestroy {
   @ViewChild(MatTable) table!: MatTable<McFile>;
   dataSource: DirectoryListDataSource;
 
-  displayedColumns = ['name', 'size'];
+  displayedColumns = ['name', 'ext','time','size', ];
+  active$: Observable<boolean> = of(false);
 
   constructor(private ccs: CommandCenterService) {
 
@@ -46,8 +48,7 @@ export class DirectoryListComponent implements   AfterViewInit, OnDestroy {
         this.dataSource.refresh(f)
       }
     );
-
-
+    this.active$ = this.ccs.OnDirectoryFocus(this.name);
   }
 
   refresh() {
@@ -55,5 +56,10 @@ export class DirectoryListComponent implements   AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+  }
+
+  focus() {
+    console.log('focus ', this.name, new Date())
+    this.ccs.requestFocus(this.name);
   }
 }

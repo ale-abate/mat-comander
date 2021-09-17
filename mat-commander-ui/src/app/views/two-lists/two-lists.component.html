@@ -1,10 +1,35 @@
+<div>
+  <div class="left-toolbar">
+    <mat-toolbar>
+      <button mat-flat-button (click)="ccs.refreshDirectoryList('left')">L</button>
+    </mat-toolbar>
+  </div>
+  <div class="right-toolbar">
+    <mat-toolbar>
+      <button mat-flat-button (click)="ccs.refreshDirectoryList('right')">R</button>
+    </mat-toolbar>
+  </div>
+</div>
+
+
 <div class="container">
-  <div class="left-col" >
+  <div class="left-col">
     <app-directory-list [name]="'left'"></app-directory-list>
   </div>
-  <div  class="right-col">
+  <div class="center-col">
+    <button mat-icon-button>
+      <mat-icon>file_copy</mat-icon>
+    </button>
+    <button mat-icon-button>
+      <mat-icon>file_copy</mat-icon>
+    </button>
+  </div>
+  <div class="right-col">
     <app-directory-list [name]="'right'"></app-directory-list>
   </div>
 </div>
+
+
+<mat-toolbar class="bottom-bar">xxx</mat-toolbar>
 
 

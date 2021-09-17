@@ -1,8 +1,31 @@
-.full-width-table {
-  width: 100%;
+@use '~@angular/material' as mat;
+
+$my-palette: mat.define-palette(mat.$indigo-palette);
+$shadow-color: mat.get-color-from-palette($my-palette, 900);
+
+.folder-not-active {
+  @include mat.elevation(1);
+}
+
+.folder-active {
+  @include mat.elevation(9, $shadow-color, 1);
+}
+
+div.folder-active  table .mat-header-cell  {
+  background-color: mat.get-color-from-palette($my-palette, 100);
+}
+
+.header-align-right {
+  text-align: right;
+  justify-content: flex-end;
+  direction: rtl;
+  padding-right: 3px;
+}
+
+.cell-align-right {
+  text-align: right;
+  justify-content: right;
+  padding-right: 3px;
 }
 
 
-mat-toolbar {
-  position: sticky;
-}

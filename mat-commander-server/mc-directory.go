@@ -5,14 +5,17 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"path/filepath"
 	"strings"
+	"time"
 )
 
 type McFile struct {
-	Name string `json:"name"`
-	Ext  string `json:"ext"`
-	Size int64  `json:"size"`
-	Dir  bool   `json:"dir"`
+	Name string    `json:"name"`
+	Ext  string    `json:"ext"`
+	Size int64     `json:"size"`
+	Dir  bool      `json:"dir"`
+	Time time.Time `json:"time"`
 }
 
 type McDirFilter struct {
@@ -41,7 +44,12 @@ func doDirectoryList(filter *McDirFilter) []McFile {
 	}
 
 	for _, f := range files {
-		file := McFile{f.Name(), "", f.Size(), true}
+		ext := filepath.Ext(f.Name())
+		name := f.Name()[:len(f.Name())-len(ext)]
+		if len(ext) > 0 {
+			ext = ext[1:]
+		}
+		file := McFile{name, ext, f.Size(), f.IsDir(), f.ModTime()}
 		result = append(result, file)
 	}
 	return result

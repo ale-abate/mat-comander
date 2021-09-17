@@ -7,7 +7,7 @@ import {TwoListsComponent} from './views/two-lists/two-lists.component';
 import {AppStatusResolver} from './services/app-status.resolver';
 
 const routes: Routes = [
-  {path: '', component: TwoListsComponent},
+  {path: '', component: TwoListsComponent, resolve: { "appStatus" : AppStatusResolver}},
   {path: 'home', component: TwoListsComponent, resolve: { "appStatus" : AppStatusResolver}},
   {path: 'otro', component: OtroExampleComponent},
   {path: 'config/tools', component: ToolsComponent},

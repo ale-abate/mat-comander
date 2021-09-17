@@ -1,7 +1,6 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {CommandCenterService} from '../../services/command-center.service';
 import {ActivatedRoute} from '@angular/router';
-import {LogicalFileSystem} from '@angular/compiler-cli/src/ngtsc/file_system';
 
 @Component({
   selector: 'app-two-lists',
@@ -13,7 +12,7 @@ export class TwoListsComponent implements OnInit {
 
 
   constructor(private route: ActivatedRoute,
-    private cs: CommandCenterService) { }
+    public ccs: CommandCenterService) { }
 
   ngOnInit(): void {
     this.route.data.subscribe(

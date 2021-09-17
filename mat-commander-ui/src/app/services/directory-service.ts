@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 
 
 export interface McFile {
@@ -8,6 +8,7 @@ export interface McFile {
   ext:  string ;
   size: number ;
   dir:  boolean ;
+  time?:  Date;
 }
 
 export interface  McDirFilter  {
