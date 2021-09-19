@@ -1,4 +1,4 @@
-package main
+package mc_local_file_system
 
 import (
 	"encoding/json"
@@ -22,7 +22,7 @@ type McDirFilter struct {
 	Path string `json:"path"`
 }
 
-func getDirectoryList(w http.ResponseWriter, r *http.Request) {
+func GetDirectoryList(w http.ResponseWriter, r *http.Request) {
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	var filter McDirFilter
 	json.Unmarshal(reqBody, &filter)

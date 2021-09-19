@@ -1,0 +1,14 @@
+<mat-toolbar>
+  <mat-select [compareWith]="compareByName" [value]="selectedRoot"
+              (selectionChange)="doRootSelectionChange($event)"
+              style="width:60px; font-size: .7em" >
+    <mat-select-trigger >
+      <img src="/assets/icons/mount/{{selectedRoot?.type}}.svg" width="24px">
+    </mat-select-trigger>
+
+    <mat-option *ngFor="let r of (rootList$ | async)" [value]="r">
+      <img src="/assets/icons/mount/{{r.type}}.svg" width="24px">
+      {{r.name}}1 2 3 4 5</mat-option>
+  </mat-select> --- {{selectedRoot?.name}}---
+  <button mat-flat-button (click)="ccs.refreshDirectoryList(name)">L</button>
+</mat-toolbar>

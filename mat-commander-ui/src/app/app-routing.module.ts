@@ -11,7 +11,7 @@ const routes: Routes = [
   {path: 'home', component: TwoListsComponent, resolve: { "appStatus" : AppStatusResolver}},
   {path: 'otro', component: OtroExampleComponent},
   {path: 'config/tools', component: ToolsComponent},
-  {path: 'config/preferences', component: PreferencesFormComponent}
+  {path: 'config/preferences', component: PreferencesFormComponent, resolve: { "appStatus" : AppStatusResolver}}
 ];
 
 @NgModule({

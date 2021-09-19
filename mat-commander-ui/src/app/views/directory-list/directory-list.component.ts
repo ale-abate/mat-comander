@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, Input, OnDestroy, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {MatSort} from '@angular/material/sort';
 import {MatTable} from '@angular/material/table';
 import {McFile} from '../../services/directory-service';
@@ -11,7 +11,7 @@ import {Observable, of} from 'rxjs';
   templateUrl: './directory-list.component.html',
   styleUrls: ['./directory-list.component.scss']
 })
-export class DirectoryListComponent implements   AfterViewInit, OnDestroy {
+export class DirectoryListComponent implements   AfterViewInit, OnDestroy , OnInit{
 
   @Input('name') name: string = "";
 
@@ -32,24 +32,23 @@ export class DirectoryListComponent implements   AfterViewInit, OnDestroy {
     this.dataSource.sort = this.sort;
     this.table.dataSource = this.dataSource;
 
-    console.log('init list', this.name)
-
-
     this.ccs.onDirectoryChanged(this.name)
       .subscribe(
         f => {
-          console.log('dir ');
           this.refresh()
         }
       );
     this.ccs.OnContentDirectoryChanged(this.name).subscribe(
       f => {
-        console.log('dir content')
         this.dataSource.refresh(f)
       }
     );
+
+  }
+  ngOnInit(): void {
     this.active$ = this.ccs.OnDirectoryFocus(this.name);
   }
+
 
   refresh() {
     this.ccs.refreshDirectoryList(this.name);
@@ -59,7 +58,6 @@ export class DirectoryListComponent implements   AfterViewInit, OnDestroy {
   }
 
   focus() {
-    console.log('focus ', this.name, new Date())
     this.ccs.requestFocus(this.name);
   }
 }

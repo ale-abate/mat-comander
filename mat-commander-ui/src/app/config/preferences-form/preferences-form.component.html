@@ -1,10 +1,28 @@
-<form [formGroup]="preferencesForm" novalidate  autocomplete="off">
+<form [formGroup]="preferencesForm" novalidate autocomplete="off">
   <mat-card class="shipping-card">
     <mat-card-header>
-      <mat-card-title> Preferences </mat-card-title>
+      <mat-card-title> Preferences</mat-card-title>
     </mat-card-header>
     <mat-card-content>
       <div class="row">
+        <div class="col" style="flex: unset; align-self:   center">
+          <img src="/assets/icons/mount/{{preferencesForm.controls['leftRootFolder'].value?.type}}.svg"
+               width="24px">
+        </div>
+        <div class="col" style="flex: unset">
+          <mat-form-field class="full-width"  >
+            <mat-select placeholder="Default Left Root" formControlName="leftRootFolder"  [compareWith]="compareByName">
+              <mat-option *ngFor="let r of (rootList$ | async)" [value]="r">
+                <img src="/assets/icons/mount/{{r.type}}.svg" width="24px" style="vertical-align:middle">
+                {{r.name}}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="preferencesForm.controls['leftRootFolder'].hasError('required')">
+              Default  Left Root is <strong>required</strong>
+            </mat-error>
+          </mat-form-field>
+        </div>
+
         <div class="col">
           <mat-form-field class="full-width">
             <input matInput placeholder="Default Left Folder" formControlName="leftFolder">
@@ -13,6 +31,27 @@
             </mat-error>
           </mat-form-field>
         </div>
+
+      </div>
+      <div class="row">
+        <div class="col" style="flex: unset; align-self:   center">
+          <img src="/assets/icons/mount/{{preferencesForm.controls['rightRootFolder'].value?.type}}.svg"
+               width="24px" style="vertical-align:middle">
+        </div>
+        <div class="col" style="flex: unset">
+          <mat-form-field class="full-width">
+            <mat-select placeholder="Default Root Right Folder" formControlName="rightRootFolder"  [compareWith]="compareByName">
+              <mat-option *ngFor="let r of (rootList$ | async)" [value]="r">
+                <img src="/assets/icons/mount/{{r.type}}.svg" width="24px" vertical-align:middle>
+                {{r.name}}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="preferencesForm.controls['rightRootFolder'].hasError('required')">
+              Default Root Right Folder is <strong>required</strong>
+            </mat-error>
+          </mat-form-field>
+        </div>
+
         <div class="col">
           <mat-form-field class="full-width">
             <input matInput placeholder="Default Right Folder" formControlName="rightFolder">
@@ -24,12 +63,12 @@
       </div>
       <div class="row">
         <div class="col">
-            <mat-checkbox   formControlName="rememberLastUsedFolders">Remember Last Used Folders</mat-checkbox>
+          <mat-checkbox formControlName="rememberLastUsedFolders">Remember Last Used Folders</mat-checkbox>
         </div>
       </div>
     </mat-card-content>
     <mat-card-actions>
-      <button mat-raised-button color="primary"   (click)="applyPreferences()">Submit</button>
+      <button mat-raised-button color="primary" (click)="applyPreferences()">Submit</button>
     </mat-card-actions>
   </mat-card>
 </form>

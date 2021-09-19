@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {DirectoryService, McFile} from './directory-service';
+import {DirectoryService, McFile, McRootFolder} from './directory-service';
 import {BehaviorSubject, Observable, Subject} from 'rxjs';
 import {Configuration, PreferencesService} from './preferences.service';
 import {map} from 'rxjs/operators';
@@ -10,6 +10,7 @@ export interface AppStatus {
   currentFolder?: McFile;
   currentLeftFolder? : McFile;
   currentRightFolder? : McFile;
+  rootList:  McRootFolder[];
 }
 
 
@@ -18,8 +19,6 @@ export interface AppStatus {
   providedIn: 'root'
 })
 export class CommandCenterService {
-
-
   private appStatus : AppStatus | undefined = undefined;
 
   private directoryChanged  =  {
@@ -35,6 +34,7 @@ export class CommandCenterService {
     "right" : new BehaviorSubject<boolean>(false),
   }
 
+  private rootListChanged = new BehaviorSubject<McRootFolder[]>([]);
 
 
   onDirectoryChanged(name: string) : Observable<McFile>   {
@@ -49,6 +49,9 @@ export class CommandCenterService {
     return this.isLeft(name) ? this.directoryFocusChanged.left.asObservable() : this.directoryFocusChanged.right.asObservable();
   }
 
+  get onRootListChanged() : Observable<McRootFolder[]>   {
+    return this.rootListChanged.asObservable();
+  }
 
   constructor( private directoryService : DirectoryService, private preferencesService: PreferencesService ) {
   }
@@ -63,14 +66,13 @@ export class CommandCenterService {
 
   private prepareAppStatus(conf: Configuration) :AppStatus {
     this.appStatus = {
+      rootList: [],
       currentName: "left",
-      currentLeftFolder: { name: conf.leftFolder as string, dir: true, ext: '', size: 0},
-      currentRightFolder: { name: conf.rightFolder as string, dir: true, ext: '', size: 0},
+      currentLeftFolder: { name: conf.leftFolder as string},
+      currentRightFolder: { name: conf.rightFolder as string}
     };
 
     this.appStatus.currentFolder = this.appStatus.currentLeftFolder;
-
-    console.log('status ready')
 
     if (this.appStatus.currentLeftFolder) {
       this.directoryChanged.left.next(this.appStatus.currentLeftFolder);
@@ -78,10 +80,21 @@ export class CommandCenterService {
     if (this.appStatus.currentRightFolder) {
       this.directoryChanged.right.next(this.appStatus.currentRightFolder);
     }
+    this.refreshRootList();
 
-
+    this.requestFocus("left");
 
     return this.appStatus;
+  }
+
+  private refreshRootList() {
+    this.directoryService.listRoot().subscribe(roots => {
+      if( this.appStatus &&
+        JSON.stringify(this.appStatus.rootList) != JSON.stringify(roots)) {
+        this.appStatus.rootList=roots;
+        this.rootListChanged.next(roots);
+      }
+    });
   }
 
   refreshDirectoryList(name: string) {
@@ -89,7 +102,6 @@ export class CommandCenterService {
     const path = this.isLeft(name) ? this.appStatus?.currentLeftFolder?.name : this.appStatus?.currentRightFolder?.name;
     this.directoryService.listDir({path}).subscribe(
       content => {
-        console.log("read", path, content)
         if (this.isLeft(name))
           this.directoryContentChanged.left.next(content);
         else

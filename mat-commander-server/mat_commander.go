@@ -1,87 +1,27 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
 	"github.com/gorilla/mux"
 	"log"
+	"mat-commander/mc-configuration"
+	mc_http_server "mat-commander/mc-http-server"
+	"mat-commander/mc-local-file-system"
 	"net/http"
-	"path"
-	"path/filepath"
-	"strings"
 )
 
 func main() {
 
 	myRouter := mux.NewRouter().StrictSlash(true)
-	myRouter.HandleFunc("/", serveTemplate)
-	myRouter.HandleFunc("/{!(api)}", serveTemplate)
-	myRouter.HandleFunc("/api/hola", processHola)
-	myRouter.HandleFunc("/api/hola/{id}", processHola)
-	myRouter.HandleFunc("/api/dir", getDirectoryList)
-	myRouter.HandleFunc("/api/config/preferences", updateConfigPreferences).Methods("POST")
-	myRouter.HandleFunc("/api/config/preferences", getConfigPreferences).Methods("GET")
+	myRouter.HandleFunc("/", mc_http_server.ServeTemplate)
+	myRouter.HandleFunc("/{!(api)}", mc_http_server.ServeTemplate)
+	myRouter.HandleFunc("/api/dir", mc_local_file_system.GetDirectoryList)
+	myRouter.HandleFunc("/api/root", mc_local_file_system.GetRootFolderList)
+	myRouter.HandleFunc("/api/config/preferences", mc_configuration.UpdateConfigPreferences).Methods("POST")
+	myRouter.HandleFunc("/api/config/preferences", mc_configuration.GetConfigPreferences).Methods("GET")
 
 	log.Println("Listening on :3000...")
 	err := http.ListenAndServe(":3000", myRouter)
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func serveTemplate(w http.ResponseWriter, r *http.Request) {
-	qpath := r.URL.Path
-	if !strings.HasPrefix(qpath, "/") {
-		qpath = "/" + qpath
-		r.URL.Path = qpath
-	}
-	ppath := "./static" + qpath
-
-	dir, name := filepath.Split(ppath)
-	fs := http.Dir(dir)
-
-	f, err := fs.Open(name)
-	if err != nil {
-		log.Println("file cannot be opened:", name)
-		ppath = "./static/index.html"
-		http.ServeFile(w, r, path.Clean(ppath))
-		return
-	}
-	defer f.Close()
-
-	_, err = f.Stat()
-	if err != nil {
-		log.Println("file not found:", name)
-		ppath = "./static/index.html"
-		http.ServeFile(w, r, path.Clean(ppath))
-		return
-	}
-
-	http.ServeFile(w, r, path.Clean(ppath))
-}
-
-type Article struct {
-	Title   string `json:"Title"`
-	Desc    string `json:"desc"`
-	Content string `json:"content"`
-}
-
-// let's declare a global Articles array
-// that we can then populate in our main function
-// to simulate a database
-var Articles []Article
-
-func processHola(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	key := vars["id"]
-
-	if key != "" {
-		fmt.Fprintf(w, "Key: "+key)
-	}
-
-	Articles = []Article{
-		Article{Title: "Hello", Desc: "Article Description", Content: "Article Content"},
-		Article{Title: "Hello 2", Desc: "Article Description", Content: "Article Content"},
-	}
-	json.NewEncoder(w).Encode(Articles)
 }

@@ -1,9 +1,8 @@
 import {DataSource} from '@angular/cdk/collections';
-import {MatSort, Sort} from '@angular/material/sort';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {MatSort} from '@angular/material/sort';
+import {BehaviorSubject, merge, Observable} from 'rxjs';
 import {McFile} from '../../services/directory-service';
-import {map,  } from 'rxjs/operators';
-import {  merge } from 'rxjs';
+import {map,} from 'rxjs/operators';
 
 /**
  * Data source for the DirectoryList view. This class should
@@ -58,7 +57,7 @@ export class DirectoryListDataSource extends DataSource<McFile> {
         case 'name':
           return compare(a.name, b.name, isAsc);
         case 'size':
-          return compare(+a.size, +b.size, isAsc);
+          return compare( (a.size!==undefined) ? +a.size : 0, (b.size!==undefined) ? +b.size : 0, isAsc);
         default:
           return 0;
       }
