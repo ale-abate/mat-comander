@@ -12,11 +12,9 @@ import (
 )
 
 type Configuration struct {
-	LeftRootFolder          mc_local_file_system.McRootFolder `json:"leftRootFolder"`
-	LeftFolder              string                            `json:"leftFolder"`
-	RightRootFolder         mc_local_file_system.McRootFolder `json:"rightRootFolder"`
-	RightFolder             string                            `json:"rightFolder"`
-	RememberLastUsedFolders bool                              `json:"rememberLastUsedFolders"`
+	LeftDir                 mc_local_file_system.McDir `json:"left_dir"`
+	RightDir                mc_local_file_system.McDir `json:"right_dir"`
+	RememberLastUsedFolders bool                       `json:"rememberLastUsedFolders"`
 }
 
 func GetConfigPreferences(w http.ResponseWriter, r *http.Request) {
@@ -38,14 +36,20 @@ func GetConfigPreferences(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		conf := Configuration{
-			LeftFolder:              home,
-			RightFolder:             home,
-			RememberLastUsedFolders: true,
-			LeftRootFolder:          mc_local_file_system.McRootFolder{Name: defaultRF.Mountpoint, Type: defaultRF.Fstype},
-			RightRootFolder:         mc_local_file_system.McRootFolder{Name: defaultRF.Mountpoint, Type: defaultRF.Fstype},
+		defRoot := mc_local_file_system.McRootFolder{Name: defaultRF.Mountpoint, Type: defaultRF.Fstype}
+		defDir := mc_local_file_system.McDir{
+			Root: defRoot,
+			Path: home,
+			File: mc_local_file_system.SolveFile(defRoot, home),
 		}
 
+		conf := Configuration{
+			LeftDir:                 defDir,
+			RightDir:                defDir,
+			RememberLastUsedFolders: true,
+		}
+
+		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(conf)
 	} else {
 		defer jsonFile.Close()
@@ -53,6 +57,7 @@ func GetConfigPreferences(w http.ResponseWriter, r *http.Request) {
 		conf := Configuration{}
 		content, _ := ioutil.ReadAll(jsonFile)
 		json.Unmarshal(content, &conf)
+		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(conf)
 	}
 }
@@ -75,6 +80,6 @@ func UpdateConfigPreferences(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Error saving configuration", err)
 	}
-
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(conf)
 }

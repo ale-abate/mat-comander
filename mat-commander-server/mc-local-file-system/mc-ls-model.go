@@ -1,0 +1,28 @@
+package mc_local_file_system
+
+import (
+	"time"
+)
+
+type McFile struct {
+	Name string    `json:"name"`
+	Ext  string    `json:"ext"`
+	Size int64     `json:"size"`
+	Dir  bool      `json:"dir"`
+	Time time.Time `json:"time"`
+}
+
+type McDirFilter struct {
+	Path string `json:"path"`
+}
+
+type McRootFolder struct {
+	Name string `json:"name"`
+	Type string `json:"type"`
+}
+
+type McDir struct {
+	Root McRootFolder `json:"rootFolder"`
+	Path string       `json:"path"`
+	File McFile       `json:"file"`
+}

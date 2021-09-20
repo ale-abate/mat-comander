@@ -11,14 +11,20 @@ export interface McFile {
   time?:  Date;
 }
 
-
-export interface  McDirFilter  {
-  path?: string ;
-}
-
 export interface  McRootFolder   {
   name: string ;
   type:  string ;
+}
+
+export interface McDir {
+  rootFolder: McRootFolder ;
+  path?: string;
+  file?: McFile;
+
+}
+
+export interface  McDirFilter  {
+  path?: string ;
 }
 
 

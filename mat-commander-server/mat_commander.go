@@ -7,9 +7,21 @@ import (
 	mc_http_server "mat-commander/mc-http-server"
 	"mat-commander/mc-local-file-system"
 	"net/http"
+	"os"
+	"path/filepath"
 )
 
 func main() {
+
+	ex, err1 := os.Executable()
+	if err1 != nil {
+		panic(err1)
+	}
+	exPath := filepath.Dir(ex)
+
+	println("Executable at", exPath, os.Args[0])
+	getwd, _ := os.Getwd()
+	println("starting at", getwd)
 
 	myRouter := mux.NewRouter().StrictSlash(true)
 	myRouter.HandleFunc("/", mc_http_server.ServeTemplate)

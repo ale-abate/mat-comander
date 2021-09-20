@@ -1,14 +1,38 @@
 <mat-toolbar>
   <mat-select [compareWith]="compareByName" [value]="selectedRoot"
               (selectionChange)="doRootSelectionChange($event)"
-              style="width:60px; font-size: .7em" >
-    <mat-select-trigger >
-      <img src="/assets/icons/mount/{{selectedRoot?.type}}.svg" width="24px">
+              style="width:60px">
+    <mat-select-trigger>
+      <img src="/assets/icons/mount/{{selectedRoot?.type}}.svg" width="24px" width="24px" style="vertical-align:middle">
+      {{selectedRoot.name}}
     </mat-select-trigger>
 
     <mat-option *ngFor="let r of (rootList$ | async)" [value]="r">
-      <img src="/assets/icons/mount/{{r.type}}.svg" width="24px">
-      {{r.name}}1 2 3 4 5</mat-option>
-  </mat-select> --- {{selectedRoot?.name}}---
-  <button mat-flat-button (click)="ccs.refreshDirectoryList(name)">L</button>
+      <img src="/assets/icons/mount/{{r.type}}.svg" width="24px" width="24px" style="vertical-align:middle">
+      {{r.name}}
+    </mat-option>
+  </mat-select>
+
+  <span *ngFor="let s of pathParts; let ix = index">
+    <ng-container *ngIf="ix>0">
+        <span>{{s}}</span>
+
+        <button mat-icon-button *ngIf="ix<pathParts.length-1" [matMenuTriggerFor]="menu"
+                aria-label="Show sibling folders"
+            (click) = "clickPathPart(s,ix)"
+        >
+         <mat-icon style="vertical-align:middle">arrow_drop_down</mat-icon></button>
+        <mat-menu #menu="matMenu">
+
+          <button mat-menu-item>
+            <mat-icon>dialpad</mat-icon>
+            <span>Redial</span>
+          </button>
+        </mat-menu>
+      </ng-container>
+  </span>
+
+  <span class="global-spacer"></span>
+
+  <button mat-icon-button (click)="ccs.refreshDirectoryList(name)"> <mat-icon>refresh</mat-icon> </button>
 </mat-toolbar>

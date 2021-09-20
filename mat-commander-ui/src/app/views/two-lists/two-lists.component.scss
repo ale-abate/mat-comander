@@ -6,7 +6,7 @@ $pad-col: 0.4em;
 
 
 .container {
-  height: calc(100vh -  ( #{$top-bar-size}  +  #{$button-bar-size}  + #{$bottom-bar-size} + 5px)   );
+  height: calc(100vh -  ( #{$top-bar-size}  +  #{$button-bar-size}  + #{$bottom-bar-size} + #{$progress-bar-size})    );
 }
 
 .left-toolbar, .right-toolbar {
@@ -16,9 +16,6 @@ $pad-col: 0.4em;
 
 
 
-mat-toolbar {
-  height: $button-bar-size;
-}
 
 .right-toolbar mat-toolbar {
   padding-left: $center-col-width ;

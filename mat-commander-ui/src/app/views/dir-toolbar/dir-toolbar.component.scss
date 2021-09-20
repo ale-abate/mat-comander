@@ -1,0 +1,8 @@
+@import '../../../assets/styles/variables.scss';
+
+
+mat-toolbar {
+  height: $button-bar-size - 1px;
+  font-size: .8em;
+}
+

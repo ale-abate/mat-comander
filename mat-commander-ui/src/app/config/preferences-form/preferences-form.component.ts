@@ -18,7 +18,9 @@ export class PreferencesFormComponent implements OnInit {
     rightRootFolder: [null, Validators.required],
     rememberLastUsedFolders: [true],
   });
-  private configuration: Configuration = {};
+
+  private configuration: Configuration = {left_dir: {rootFolder:{name:"",type:""}} , right_dir: {rootFolder:{name:"",type:""}} };
+
   rootList$: Observable<McRootFolder[]>;
 
   constructor(private fb: FormBuilder, private preferencesService: PreferencesService, private ccs: CommandCenterService) {
@@ -31,16 +33,22 @@ export class PreferencesFormComponent implements OnInit {
 
   applyPreferences(): void {
     this.configuration = {...this.configuration, ...this.preferencesForm.value};
+
+    this.configuration.left_dir.rootFolder=this.preferencesForm.value.leftRootFolder;
+    this.configuration.left_dir.path=this.preferencesForm.value.leftFolder;
+    this.configuration.right_dir.rootFolder=this.preferencesForm.value.rightRootFolder;
+    this.configuration.right_dir.path=this.preferencesForm.value.rightFolder;
+
     this.preferencesService.savePreferences(this.configuration).subscribe(p => this.readPreferences(p))
   }
 
   private readPreferences(conf: Configuration) {
     this.configuration = conf
     this.preferencesForm.setValue({
-        leftFolder: conf.leftFolder,
-        leftRootFolder: conf.leftRootFolder,
-        rightRootFolder: conf.rightRootFolder,
-        rightFolder: conf.rightFolder,
+        leftFolder: conf.left_dir.path,
+        leftRootFolder: conf.left_dir.rootFolder,
+        rightFolder: conf.right_dir.path,
+        rightRootFolder: conf.right_dir.rootFolder,
         rememberLastUsedFolders: conf.rememberLastUsedFolders,
       }
     )

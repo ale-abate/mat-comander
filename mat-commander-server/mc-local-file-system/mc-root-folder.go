@@ -6,11 +6,6 @@ import (
 	"net/http"
 )
 
-type McRootFolder struct {
-	Name string `json:"name"`
-	Type string `json:"type"`
-}
-
 func GetRootFolderList(w http.ResponseWriter, r *http.Request) {
 
 	var folders []McRootFolder

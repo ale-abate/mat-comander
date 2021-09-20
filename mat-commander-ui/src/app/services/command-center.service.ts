@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {DirectoryService, McFile, McRootFolder} from './directory-service';
+import {DirectoryService, McDir, McFile, McRootFolder} from './directory-service';
 import {BehaviorSubject, Observable, Subject} from 'rxjs';
 import {Configuration, PreferencesService} from './preferences.service';
 import {map} from 'rxjs/operators';
@@ -7,11 +7,19 @@ import {map} from 'rxjs/operators';
 
 export interface AppStatus {
   currentName?: string;
-  currentFolder?: McFile;
-  currentLeftFolder? : McFile;
-  currentRightFolder? : McFile;
-  rootList:  McRootFolder[];
+  currentDir?: McDir;
+  currentLeftDir?: McDir;
+  currentRightDir?: McDir;
+  rootList: McRootFolder[];
 }
+
+interface DirectoryEventSource {
+  directoryChanged: Subject<McDir>;
+  directoryContentChanged: Subject<McFile[]>,
+  directoryFocusChanged: Subject<boolean>,
+}
+
+export type FolderListName =  'left'| 'right';
 
 
 
@@ -19,66 +27,67 @@ export interface AppStatus {
   providedIn: 'root'
 })
 export class CommandCenterService {
-  private appStatus : AppStatus | undefined = undefined;
+  private appStatus: AppStatus | undefined = undefined;
 
-  private directoryChanged  =  {
-    "left" : new BehaviorSubject<McFile>(<McFile>this.appStatus?.currentLeftFolder),
-    "right" : new BehaviorSubject<McFile>(<McFile>this.appStatus?.currentRightFolder),
-  }
-  private directoryContentChanged  =  {
-    "left" : new Subject<McFile[]>(),
-    "right" : new Subject<McFile[]>(),
-  }
-  private directoryFocusChanged  =  {
-    "left" : new BehaviorSubject<boolean>(false),
-    "right" : new BehaviorSubject<boolean>(false),
-  }
+  private directoryEventSource: { [dirSource: string]: DirectoryEventSource } = {
+    "left": {
+      directoryChanged: new BehaviorSubject<McDir>(<McDir>this.appStatus?.currentLeftDir),
+      directoryContentChanged: new Subject<McFile[]>(),
+      directoryFocusChanged: new BehaviorSubject<boolean>(false),
+    },
+    "right": {
+      directoryChanged: new BehaviorSubject<McDir>(<McDir>this.appStatus?.currentLeftDir),
+      directoryContentChanged: new Subject<McFile[]>(),
+      directoryFocusChanged: new BehaviorSubject<boolean>(false),
+    },
+  };
 
   private rootListChanged = new BehaviorSubject<McRootFolder[]>([]);
 
 
-  onDirectoryChanged(name: string) : Observable<McFile>   {
-    return this.isLeft(name) ? this.directoryChanged.left.asObservable() : this.directoryChanged.right.asObservable();
+  onDirectoryChanged(name: FolderListName): Observable<McDir> {
+    return this.directoryEventSource[name].directoryChanged.asObservable();
   }
 
-  OnContentDirectoryChanged(name: string) : Observable<McFile[]>   {
-    return this.isLeft(name) ? this.directoryContentChanged.left.asObservable() : this.directoryContentChanged.right.asObservable();
+
+  OnContentDirectoryChanged(name: FolderListName): Observable<McFile[]> {
+    return this.directoryEventSource[name].directoryContentChanged.asObservable();
   }
 
-  OnDirectoryFocus(name: string) : Observable<boolean>   {
-    return this.isLeft(name) ? this.directoryFocusChanged.left.asObservable() : this.directoryFocusChanged.right.asObservable();
+  OnDirectoryFocus(name: FolderListName): Observable<boolean> {
+    return this.directoryEventSource[name].directoryFocusChanged.asObservable();
   }
 
-  get onRootListChanged() : Observable<McRootFolder[]>   {
+  get onRootListChanged(): Observable<McRootFolder[]> {
     return this.rootListChanged.asObservable();
   }
 
-  constructor( private directoryService : DirectoryService, private preferencesService: PreferencesService ) {
+  constructor(private directoryService: DirectoryService, private preferencesService: PreferencesService) {
   }
 
-  prepare()  : AppStatus | Observable<AppStatus>  {
-    if(this.appStatus !== undefined)  return this.appStatus;
+  prepare(): AppStatus | Observable<AppStatus> {
+    if (this.appStatus !== undefined) return this.appStatus;
 
     return this.preferencesService.getPreferences().pipe(
-        map(  p => this.prepareAppStatus(p) )
+      map(p => this.prepareAppStatus(p))
     );
   }
 
-  private prepareAppStatus(conf: Configuration) :AppStatus {
+  private prepareAppStatus(conf: Configuration): AppStatus {
     this.appStatus = {
       rootList: [],
       currentName: "left",
-      currentLeftFolder: { name: conf.leftFolder as string},
-      currentRightFolder: { name: conf.rightFolder as string}
+      currentLeftDir: conf.left_dir,
+      currentRightDir: conf.right_dir,
     };
 
-    this.appStatus.currentFolder = this.appStatus.currentLeftFolder;
+    this.appStatus.currentDir = this.appStatus.currentLeftDir;
 
-    if (this.appStatus.currentLeftFolder) {
-      this.directoryChanged.left.next(this.appStatus.currentLeftFolder);
+    if (this.appStatus.currentLeftDir) {
+      this.directoryEventSource.left.directoryChanged.next(this.appStatus.currentLeftDir);
     }
-    if (this.appStatus.currentRightFolder) {
-      this.directoryChanged.right.next(this.appStatus.currentRightFolder);
+    if (this.appStatus.currentRightDir) {
+      this.directoryEventSource.right.directoryChanged.next(this.appStatus.currentRightDir);
     }
     this.refreshRootList();
 
@@ -89,38 +98,34 @@ export class CommandCenterService {
 
   private refreshRootList() {
     this.directoryService.listRoot().subscribe(roots => {
-      if( this.appStatus &&
+      if (this.appStatus &&
         JSON.stringify(this.appStatus.rootList) != JSON.stringify(roots)) {
-        this.appStatus.rootList=roots;
+        this.appStatus.rootList = roots;
         this.rootListChanged.next(roots);
       }
     });
   }
 
-  refreshDirectoryList(name: string) {
+  refreshDirectoryList(name: FolderListName) {
 
-    const path = this.isLeft(name) ? this.appStatus?.currentLeftFolder?.name : this.appStatus?.currentRightFolder?.name;
+    const path = this.isLeft(name) ? this.appStatus?.currentLeftDir?.path : this.appStatus?.currentRightDir?.path;
     this.directoryService.listDir({path}).subscribe(
       content => {
-        if (this.isLeft(name))
-          this.directoryContentChanged.left.next(content);
-        else
-          this.directoryContentChanged.right.next(content);
+        this.directoryEventSource[name].directoryContentChanged.next(content);
       }
     );
   }
 
-  private isLeft(name: string):boolean {
+  private isLeft(name: FolderListName): boolean {
     return name == "left";
   }
 
-  requestFocus(name: string) {
-    const left =  this.isLeft(name) ;
-    if(this.appStatus) {
+  requestFocus(name: FolderListName) {
+    const left = this.isLeft(name);
+    if (this.appStatus) {
       this.appStatus.currentName = name;
     }
-
-    this.directoryFocusChanged.left.next(left);
-    this.directoryFocusChanged.right.next(!left);
+    this.directoryEventSource.left.directoryFocusChanged.next(left);
+    this.directoryEventSource.right.directoryFocusChanged.next(!left);
   }
 }

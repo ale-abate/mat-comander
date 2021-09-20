@@ -3,7 +3,7 @@ import {MatSort} from '@angular/material/sort';
 import {MatTable} from '@angular/material/table';
 import {McFile} from '../../services/directory-service';
 import {DirectoryListDataSource} from './directory-list-datasource';
-import {CommandCenterService} from '../../services/command-center.service';
+import {CommandCenterService, FolderListName} from '../../services/command-center.service';
 import {Observable, of} from 'rxjs';
 
 @Component({
@@ -13,7 +13,7 @@ import {Observable, of} from 'rxjs';
 })
 export class DirectoryListComponent implements   AfterViewInit, OnDestroy , OnInit{
 
-  @Input('name') name: string = "";
+  @Input('name') name: FolderListName = "left";
 
 
   @ViewChild(MatSort) sort!: MatSort;
