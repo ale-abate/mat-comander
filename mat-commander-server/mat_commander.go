@@ -25,6 +25,10 @@ func main() {
 
 	myRouter := mux.NewRouter().StrictSlash(true)
 	myRouter.HandleFunc("/", mc_http_server.ServeTemplate)
+	myRouter.HandleFunc("/assets/{.*}", mc_http_server.ServeTemplate)
+	myRouter.HandleFunc("/assets/{.*}/{.*}", mc_http_server.ServeTemplate)
+	myRouter.HandleFunc("/assets/{.*}/{.*}/{.*}", mc_http_server.ServeTemplate)
+	myRouter.HandleFunc("/assets/{.*}/{.*}/{.*}/{.*}", mc_http_server.ServeTemplate)
 	myRouter.HandleFunc("/{!(api)}", mc_http_server.ServeTemplate)
 	myRouter.HandleFunc("/api/dir", mc_local_file_system.GetDirectoryList)
 	myRouter.HandleFunc("/api/root", mc_local_file_system.GetRootFolderList)

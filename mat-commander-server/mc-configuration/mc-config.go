@@ -17,7 +17,7 @@ type Configuration struct {
 	RememberLastUsedFolders bool                       `json:"rememberLastUsedFolders"`
 }
 
-func GetConfigPreferences(w http.ResponseWriter, r *http.Request) {
+func GetConfigPreferences(w http.ResponseWriter, _ *http.Request) {
 	home, err := os.UserHomeDir()
 	if err != nil {
 		home = "."
@@ -57,6 +57,10 @@ func GetConfigPreferences(w http.ResponseWriter, r *http.Request) {
 		conf := Configuration{}
 		content, _ := ioutil.ReadAll(jsonFile)
 		json.Unmarshal(content, &conf)
+
+		conf.LeftDir.File = mc_local_file_system.SolveFile(conf.LeftDir.Root, conf.LeftDir.Path)
+		conf.RightDir.File = mc_local_file_system.SolveFile(conf.RightDir.Root, conf.RightDir.Path)
+
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(conf)
 	}

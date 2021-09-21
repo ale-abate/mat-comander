@@ -10,14 +10,15 @@ func SolveFile(root McRootFolder, path string) McFile {
 	var file McFile
 
 	switch root.Type {
-	case "NTFS":
+	case "NTFS", "ext3", "ext4":
 		fi, err := os.Stat(path)
 		if err == nil {
 			convertFileInfo2McFile(&file, fi)
 		}
 
 	default:
-		log.Fatal("Cannot solve path for ", root.Type)
+		log.Println("ERROR: Cannot solve path for ", root.Type)
+
 	}
 
 	return file

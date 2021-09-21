@@ -6,13 +6,16 @@ import (
 	"net/http"
 )
 
-func GetRootFolderList(w http.ResponseWriter, r *http.Request) {
+func GetRootFolderList(w http.ResponseWriter, _ *http.Request) {
 
 	var folders []McRootFolder
 
 	partitions, _ := disk.Partitions(false)
-	for _, partition := range partitions {
-		folders = append(folders, McRootFolder{partition.Mountpoint, partition.Fstype})
+	for ix, partition := range partitions {
+		if partition.Fstype != "squashfs" {
+			println("Partition -> ", ix, partition.Fstype, partition.Device, partition.Mountpoint, partition.Opts)
+			folders = append(folders, McRootFolder{partition.Mountpoint, partition.Fstype})
+		}
 	}
 
 	json.NewEncoder(w).Encode(folders)
