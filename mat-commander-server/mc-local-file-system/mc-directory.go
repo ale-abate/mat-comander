@@ -2,6 +2,7 @@ package mc_local_file_system
 
 import (
 	"encoding/json"
+	"io/fs"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -30,9 +31,18 @@ func doDirectoryList(filter *McDirFilter) []McFile {
 	}
 
 	for _, f := range files {
-		var file McFile
-		convertFileInfo2McFile(&file, f)
-		result = append(result, file)
+		if applyDirFilter(filter, f) {
+			var file McFile
+			convertFileInfo2McFile(&file, f)
+			result = append(result, file)
+		}
 	}
 	return result
+}
+
+func applyDirFilter(filter *McDirFilter, fi fs.FileInfo) bool {
+	if filter.onlyDir && !fi.IsDir() {
+		return false
+	}
+	return true
 }

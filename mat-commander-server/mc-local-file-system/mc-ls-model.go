@@ -13,7 +13,8 @@ type McFile struct {
 }
 
 type McDirFilter struct {
-	Path string `json:"path"`
+	Path    string `json:"path"`
+	onlyDir bool   `json:"onlyDir"`
 }
 
 type McRootFolder struct {

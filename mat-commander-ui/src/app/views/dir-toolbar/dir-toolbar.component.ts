@@ -1,7 +1,7 @@
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {MatSelectChange} from '@angular/material/select';
 import {Observable, Subscription} from 'rxjs';
-import {McDir, McRootFolder} from '../../services/directory-service';
+import {DirectoryService, McDir, McDirFilter, McFile, McRootFolder} from '../../services/directory-service';
 import {CommandCenterService, FolderListName} from '../../services/command-center.service';
 
 @Component({
@@ -16,8 +16,9 @@ export class DirToolbarComponent implements OnInit, OnDestroy {
   private dcSubscription: Subscription | null= null;
 
   public pathParts: string[] = [];
+  subDirs: McFile[] = [] ;
 
-  constructor(public ccs: CommandCenterService) {
+  constructor(public ccs: CommandCenterService, private ds: DirectoryService) {
     this.rootList$ = this.ccs.onRootListChanged;
 
   }
@@ -53,10 +54,28 @@ export class DirToolbarComponent implements OnInit, OnDestroy {
 
   clickPathPart(part: string, ix: number) {
     let newPath ="";
+    let sep = "";
     this.pathParts.filter((p,arrIx) => arrIx<= ix).
-      forEach(  (p,ix) => newPath+=p);
+      forEach(  (p,ix) => {
+      newPath += sep + p; sep ="/";
+    } );
 
-    console.log('parts: ' , newPath)
+
+
+    this.subDirs = [];
+
+    const filter : McDirFilter = {
+      path: newPath,
+      onlyDirs: true };
+
+    console.log('parts: ' , filter)
+
+    this.ds.listDir(filter).subscribe(
+      d => this.subDirs = d
+    );
+
+
+
     /*
     const dir: McDir = {path: this.newPath, rootFolder: this.selectedRoot};
 

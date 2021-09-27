@@ -40,7 +40,7 @@ func GetConfigPreferences(w http.ResponseWriter, _ *http.Request) {
 		defDir := mc_local_file_system.McDir{
 			Root: defRoot,
 			Path: home,
-			File: mc_local_file_system.SolveFile(defRoot, home),
+			File: mc_local_file_system.MapStringPathToMcFile(defRoot, home),
 		}
 
 		conf := Configuration{
@@ -58,8 +58,8 @@ func GetConfigPreferences(w http.ResponseWriter, _ *http.Request) {
 		content, _ := ioutil.ReadAll(jsonFile)
 		json.Unmarshal(content, &conf)
 
-		conf.LeftDir.File = mc_local_file_system.SolveFile(conf.LeftDir.Root, conf.LeftDir.Path)
-		conf.RightDir.File = mc_local_file_system.SolveFile(conf.RightDir.Root, conf.RightDir.Path)
+		conf.LeftDir.File = mc_local_file_system.MapStringPathToMcFile(conf.LeftDir.Root, conf.LeftDir.Path)
+		conf.RightDir.File = mc_local_file_system.MapStringPathToMcFile(conf.RightDir.Root, conf.RightDir.Path)
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(conf)

@@ -4,9 +4,11 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
+	"strings"
 )
 
-func SolveFile(root McRootFolder, path string) McFile {
+func MapStringPathToMcFile(root McRootFolder, path string) McFile {
 	var file McFile
 
 	switch root.Type {
@@ -25,15 +27,31 @@ func SolveFile(root McRootFolder, path string) McFile {
 }
 
 func convertFileInfo2McFile(file *McFile, fi os.FileInfo) {
-
-	ext := filepath.Ext(fi.Name())
-	name := fi.Name()[:len(fi.Name())-len(ext)]
-	if len(ext) > 0 {
-		ext = ext[1:]
-	}
-	file.Name = name
-	file.Ext = ext
 	file.Size = fi.Size()
 	file.Dir = fi.IsDir()
 	file.Time = fi.ModTime()
+
+	if file.Dir {
+		file.Name = fi.Name()
+		file.Ext = ""
+	} else {
+		ext := filepath.Ext(fi.Name())
+		name := fi.Name()[:len(fi.Name())-len(ext)]
+		if len(ext) > 0 {
+			ext = ext[1:]
+		}
+		file.Name = name
+		file.Ext = ext
+	}
+
+}
+
+func ConvertPathStringToArray(path string) []string {
+	path = strings.TrimSuffix(path, "/")
+	path = strings.TrimSuffix(path, "\\")
+	path = strings.TrimPrefix(path, "/")
+	path = strings.TrimPrefix(path, "\\")
+
+	re := regexp.MustCompile(`[\\/]`)
+	return re.Split(path, -1)
 }

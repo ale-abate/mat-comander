@@ -25,6 +25,7 @@ export interface McDir {
 
 export interface  McDirFilter  {
   path?: string ;
+  onlyDirs?: boolean;
 }
 
 

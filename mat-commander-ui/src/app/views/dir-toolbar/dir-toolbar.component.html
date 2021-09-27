@@ -1,7 +1,7 @@
 <mat-toolbar>
   <mat-select [compareWith]="compareByName" [value]="selectedRoot"
               (selectionChange)="doRootSelectionChange($event)"
-              style="width:60px">
+              style="width:60px;"     >
     <mat-select-trigger>
       <img src="/assets/icons/mount/{{selectedRoot?.type}}.svg" width="24px" width="24px" style="vertical-align:middle">
       {{selectedRoot.name}}
@@ -14,19 +14,22 @@
   </mat-select>
 
   <span *ngFor="let s of pathParts; let ix = index">
-    <ng-container *ngIf="ix>0">
-        <span>{{s}}</span>
+    <ng-container  >
+        <span >{{s}}</span>
 
-        <button mat-icon-button *ngIf="ix<pathParts.length-1" [matMenuTriggerFor]="menu"
+        <button mat-icon-button *ngIf="ix<pathParts.length-1"
                 aria-label="Show sibling folders"
-            (click) = "clickPathPart(s,ix)"
+            (click) = "clickPathPart(s,ix)"   [matMenuTriggerFor]="directoryMenu"
         >
-         <mat-icon style="vertical-align:middle">arrow_drop_down</mat-icon></button>
-        <mat-menu #menu="matMenu">
+         <mat-icon style="vertical-align:middle">arrow_drop_down</mat-icon>
 
-          <button mat-menu-item>
+      </button>
+
+        <mat-menu #directoryMenu="matMenu">
+
+          <button mat-menu-item  *ngFor="let dir of subDirs" >
             <mat-icon>dialpad</mat-icon>
-            <span>Redial</span>
+            <span>{{dir.name}}</span>
           </button>
         </mat-menu>
       </ng-container>
