@@ -29,3 +29,18 @@ div.folder-active  table .mat-header-cell  {
 }
 
 
+
+.file-active   {
+  background-color: mat.get-color-from-palette($my-palette, 400);
+
+  td {
+    color: mat.get-contrast-color-from-palette($my-palette, 400);
+  }
+}
+
+
+
+
+.file-not-active   {
+  background-color: unset;
+}

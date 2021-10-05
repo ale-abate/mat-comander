@@ -27,3 +27,8 @@ type McDir struct {
 	Path string       `json:"path"`
 	File McFile       `json:"file"`
 }
+
+type DirectoryOperations interface {
+	doDirectoryList(filter *McDirFilter) []McFile
+	convertPathToMcFile(path string, result *McFile) *McFile
+}

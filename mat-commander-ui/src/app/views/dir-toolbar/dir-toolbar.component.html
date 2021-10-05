@@ -1,25 +1,33 @@
 <mat-toolbar>
+
+
   <mat-select [compareWith]="compareByName" [value]="selectedRoot"
               (selectionChange)="doRootSelectionChange($event)"
-              style="width:60px;"     >
+              style="width:60px;">
     <mat-select-trigger>
-      <img src="/assets/icons/mount/{{selectedRoot?.type}}.svg" width="24px" width="24px" style="vertical-align:middle">
+      <img src="/assets/icons/mount/{{selectedRoot?.type}}.svg" width="24px"  style="vertical-align:middle">
       {{selectedRoot.name}}
     </mat-select-trigger>
 
     <mat-option *ngFor="let r of (rootList$ | async)" [value]="r">
-      <img src="/assets/icons/mount/{{r.type}}.svg" width="24px" width="24px" style="vertical-align:middle">
+      <img src="/assets/icons/mount/{{r.type}}.svg" width="24px" style="vertical-align:middle">
       {{r.name}}
     </mat-option>
   </mat-select>
 
+
+  <button mat-icon-button (click)="ccs.refreshDirectoryList(name)">
+    <mat-icon>refresh</mat-icon>
+  </button>
+
+  <span class="global-spacer"></span>
   <span *ngFor="let s of pathParts; let ix = index">
-    <ng-container  >
-        <span >{{s}}</span>
+    <ng-container>
+        <span>{{s}}</span>
 
         <button mat-icon-button *ngIf="ix<pathParts.length-1"
                 aria-label="Show sibling folders"
-            (click) = "clickPathPart(s,ix)"   [matMenuTriggerFor]="directoryMenu"
+                (click)="clickPathPart(s,ix)" [matMenuTriggerFor]="directoryMenu"
         >
          <mat-icon style="vertical-align:middle">arrow_drop_down</mat-icon>
 
@@ -27,15 +35,13 @@
 
         <mat-menu #directoryMenu="matMenu">
 
-          <button mat-menu-item  *ngFor="let dir of subDirs" >
-            <mat-icon>dialpad</mat-icon>
+          <button mat-menu-item *ngFor="let dir of subDirs">
+            <img  [src]="'/assets/icons/ext/dir.png'" height="24" />
             <span>{{dir.name}}</span>
           </button>
         </mat-menu>
       </ng-container>
   </span>
 
-  <span class="global-spacer"></span>
 
-  <button mat-icon-button (click)="ccs.refreshDirectoryList(name)"> <mat-icon>refresh</mat-icon> </button>
 </mat-toolbar>

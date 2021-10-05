@@ -17,6 +17,7 @@ interface DirectoryEventSource {
   directoryChanged: Subject<McDir>;
   directoryContentChanged: Subject<McFile[]>,
   directoryFocusChanged: Subject<boolean>,
+  directorySelectionChanged: Subject<McFile[]>,
 }
 
 export type FolderListName =  'left'| 'right';
@@ -34,11 +35,13 @@ export class CommandCenterService {
       directoryChanged: new BehaviorSubject<McDir>(<McDir>this.appStatus?.currentLeftDir),
       directoryContentChanged: new Subject<McFile[]>(),
       directoryFocusChanged: new BehaviorSubject<boolean>(false),
+      directorySelectionChanged: new Subject<McFile[]>(),
     },
     "right": {
       directoryChanged: new BehaviorSubject<McDir>(<McDir>this.appStatus?.currentLeftDir),
       directoryContentChanged: new Subject<McFile[]>(),
       directoryFocusChanged: new BehaviorSubject<boolean>(false),
+      directorySelectionChanged: new Subject<McFile[]>(),
     },
   };
 
@@ -58,9 +61,15 @@ export class CommandCenterService {
     return this.directoryEventSource[name].directoryFocusChanged.asObservable();
   }
 
+  OnDirectorySelectionChanged(name: FolderListName): Observable<McFile[]> {
+    return this.directoryEventSource[name].directorySelectionChanged.asObservable();
+  }
+
   get onRootListChanged(): Observable<McRootFolder[]> {
     return this.rootListChanged.asObservable();
   }
+
+
 
   constructor(private directoryService: DirectoryService, private preferencesService: PreferencesService) {
   }
@@ -127,5 +136,24 @@ export class CommandCenterService {
     }
     this.directoryEventSource.left.directoryFocusChanged.next(left);
     this.directoryEventSource.right.directoryFocusChanged.next(!left);
+  }
+
+
+  notifySelection(name: FolderListName, selectedFiles: McFile[]) {
+    this.directoryEventSource[name].directorySelectionChanged.next(selectedFiles);
+  }
+
+  doAction(name: FolderListName, currentRootDir: McDir, row: McFile) {
+    currentRootDir.path += '/' + row.name
+    if(this.isLeft(name)) {
+      // @ts-ignore
+      this.appStatus.currentLeftDir  = currentRootDir;
+    } else {
+      // @ts-ignore
+      this.appStatus.currentRightDir = currentRootDir;
+    }
+    alert(currentRootDir?.path)
+
+    this.refreshDirectoryList(name);
   }
 }

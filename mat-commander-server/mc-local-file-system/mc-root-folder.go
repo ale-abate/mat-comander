@@ -7,9 +7,21 @@ import (
 )
 
 func GetRootFolderList(w http.ResponseWriter, _ *http.Request) {
+	folders := findAllRoots()
+	json.NewEncoder(w).Encode(folders)
+}
 
+var defaultRoot *McRootFolder
+
+func GetDefaultRoot() *McRootFolder {
+	if defaultRoot == nil {
+		defaultRoot = &findAllRoots()[0]
+	}
+	return defaultRoot
+}
+
+func findAllRoots() []McRootFolder {
 	var folders []McRootFolder
-
 	partitions, _ := disk.Partitions(false)
 	for ix, partition := range partitions {
 		if partition.Fstype != "squashfs" {
@@ -17,6 +29,5 @@ func GetRootFolderList(w http.ResponseWriter, _ *http.Request) {
 			folders = append(folders, McRootFolder{partition.Mountpoint, partition.Fstype})
 		}
 	}
-
-	json.NewEncoder(w).Encode(folders)
+	return folders
 }

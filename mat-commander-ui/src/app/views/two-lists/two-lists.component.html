@@ -12,14 +12,32 @@
   <div class="left-col">
     <app-directory-list [name]="'left'"></app-directory-list>
   </div>
+
+
   <div class="center-col">
-    <button mat-icon-button>
+    <button mat-icon-button title="Copy">
       <mat-icon>file_copy</mat-icon>
     </button>
     <button mat-icon-button>
-      <mat-icon>file_copy</mat-icon>
+      <mat-icon>delete</mat-icon>
     </button>
+    <button mat-icon-button>
+      <mat-icon>search</mat-icon>
+    </button>
+
+    {{focused}}
+
+    {{files['left'].length}} ||
+
+     {{files['right'].length}}
+
+
   </div>
+
+
+
+
+
   <div class="right-col">
     <app-directory-list [name]="'right'"></app-directory-list>
   </div>
