@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 type NTFS struct {
@@ -27,6 +28,19 @@ func (ntfs *NTFS) doDirectoryList(filter *McDirFilter) []McFile {
 	if strings.Trim(filter.Path, " ") == "" {
 		filter.Path = "."
 	}
+	filter.Path = strings.ReplaceAll(filter.Path, "/", string(os.PathSeparator))
+
+	parts := strings.Split(filter.Path, string(os.PathSeparator))
+	if len(parts) > 1 {
+		prev := McFile{
+			Name: "..",
+			Ext:  "",
+			Size: 0,
+			Dir:  true,
+			Time: time.Time{},
+		}
+		result = append(result, prev)
+	}
 
 	files, err := ioutil.ReadDir(filter.Path)
 	if err != nil {
@@ -40,6 +54,7 @@ func (ntfs *NTFS) doDirectoryList(filter *McDirFilter) []McFile {
 			result = append(result, file)
 		}
 	}
+
 	return result
 }
 

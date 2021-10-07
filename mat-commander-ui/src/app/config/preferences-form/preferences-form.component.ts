@@ -19,7 +19,9 @@ export class PreferencesFormComponent implements OnInit {
     rememberLastUsedFolders: [true],
   });
 
-  private configuration: Configuration = {left_dir: {rootFolder:{name:"",type:""}} , right_dir: {rootFolder:{name:"",type:""}} };
+  private configuration: Configuration = {
+    left_dir: {rootFolder:{name:"",type:"", separator: "/"}} ,
+    right_dir: {rootFolder:{name:"",type:"", separator: "/"}} };
 
   rootList$: Observable<McRootFolder[]>;
 

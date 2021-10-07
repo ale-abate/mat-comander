@@ -14,6 +14,7 @@ export interface McFile {
 export interface  McRootFolder   {
   name: string ;
   type:  string ;
+  separator: string;
 }
 
 export interface McDir {

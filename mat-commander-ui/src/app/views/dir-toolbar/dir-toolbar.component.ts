@@ -12,7 +12,7 @@ import {CommandCenterService, FolderListName} from '../../services/command-cente
 export class DirToolbarComponent implements OnInit, OnDestroy {
   @Input('name') name: FolderListName = "left";
   rootList$: Observable<McRootFolder[]>;
-  public selectedRoot: McRootFolder = {name: '', type: ''};
+  public selectedRoot: McRootFolder = {name: '', type: '', separator: '/'};
   private dcSubscription: Subscription | null= null;
 
   public pathParts: string[] = [];
@@ -47,8 +47,8 @@ export class DirToolbarComponent implements OnInit, OnDestroy {
 
   private onDirectoryChanged(dir: McDir) {
     this.selectedRoot = dir.rootFolder;
-    console.log('dc',this.name, JSON.stringify(dir));
-    this.pathParts=   dir.path?.split("\\") as string[];
+    console.log('dc',this.name, JSON.stringify(dir), dir.rootFolder.separator);
+    this.pathParts=   dir.path?.split(dir.rootFolder.separator) as string[];
   }
 
 

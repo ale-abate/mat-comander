@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/shirou/gopsutil/disk"
 	"net/http"
+	"os"
 )
 
 func GetRootFolderList(w http.ResponseWriter, _ *http.Request) {
@@ -26,7 +27,7 @@ func findAllRoots() []McRootFolder {
 	for ix, partition := range partitions {
 		if partition.Fstype != "squashfs" {
 			println("Partition -> ", ix, partition.Fstype, partition.Device, partition.Mountpoint, partition.Opts)
-			folders = append(folders, McRootFolder{partition.Mountpoint, partition.Fstype})
+			folders = append(folders, McRootFolder{Name: partition.Mountpoint, Type: partition.Fstype, Separator: string(os.PathSeparator)})
 		}
 	}
 	return folders

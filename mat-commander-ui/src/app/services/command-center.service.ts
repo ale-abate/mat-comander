@@ -144,16 +144,30 @@ export class CommandCenterService {
   }
 
   doAction(name: FolderListName, currentRootDir: McDir, row: McFile) {
-    currentRootDir.path += '/' + row.name
-    if(this.isLeft(name)) {
+    if(row.dir) {
+      this.doActionChangeDir(currentRootDir, row, name);
+    }
+  }
+
+  private doActionChangeDir(currentRootDir: McDir, row: McFile, name: "left" | "right") {
+    if(row.name=='..') {
+      const ix = currentRootDir.path?.lastIndexOf(currentRootDir.rootFolder.separator);
+      if(ix) {
+        currentRootDir.path = currentRootDir.path?.substring(0,ix);
+      }
+    } else {
+      currentRootDir.path += currentRootDir.rootFolder.separator + row.name
+    }
+
+
+    if (this.isLeft(name)) {
       // @ts-ignore
-      this.appStatus.currentLeftDir  = currentRootDir;
+      this.appStatus.currentLeftDir = currentRootDir;
     } else {
       // @ts-ignore
       this.appStatus.currentRightDir = currentRootDir;
     }
-    alert(currentRootDir?.path)
-
     this.refreshDirectoryList(name);
+    this.directoryEventSource[name].directoryChanged.next(currentRootDir);
   }
 }

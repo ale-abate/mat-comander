@@ -36,7 +36,7 @@ func GetConfigPreferences(w http.ResponseWriter, _ *http.Request) {
 			}
 		}
 
-		defRoot := mc_local_file_system.McRootFolder{Name: defaultRF.Mountpoint, Type: defaultRF.Fstype}
+		defRoot := mc_local_file_system.McRootFolder{Name: defaultRF.Mountpoint, Type: defaultRF.Fstype, Separator: string(os.PathSeparator)}
 		defDir := mc_local_file_system.McDir{
 			Root: defRoot,
 			Path: home,
