@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
 import {CommandCenterService, FolderListName} from '../../services/command-center.service';
 import {ActivatedRoute} from '@angular/router';
 import {Subscription} from 'rxjs';
@@ -12,6 +12,8 @@ import {McFile} from '../../services/directory-service';
 })
 export class TwoListsComponent implements OnInit, OnDestroy {
   focused?: FolderListName = undefined;
+  private keyCommand: { [key: string]: string } ={};
+  private supportedCommands : string[] =  ["copy"];
 
   files:  { [dirSource: string]: McFile[] } = {
       "right" : [],
@@ -19,6 +21,24 @@ export class TwoListsComponent implements OnInit, OnDestroy {
   };
 
   private subscriptions: Subscription[] =[];
+
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+    if( this.keyCommand[event.key] )  {
+      const commandName = this.keyCommand[event.key];
+      if(  this.supportedCommands.includes(commandName)) {
+        console.log('KEY: ', event.key, " Command: ", commandName);
+
+        if (this.ccs.canExecuteCommand(commandName)) {
+          this.ccs.doExecuteCommand(commandName);
+          event.stopPropagation();
+        }
+
+        event.preventDefault();
+      }
+    }
+  }
 
 
   constructor(private route: ActivatedRoute,
@@ -35,6 +55,10 @@ export class TwoListsComponent implements OnInit, OnDestroy {
       this.files['left'] = files
     ));
 
+    this.subscriptions.push(this.ccs.OnKeyCommandListChanged.subscribe(keyCommand => {
+      console.log("key command" , keyCommand);
+      this.keyCommand = keyCommand;
+    }));
 
   }
 

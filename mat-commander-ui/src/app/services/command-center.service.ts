@@ -3,6 +3,7 @@ import {DirectoryService, McDir, McFile, McRootFolder} from './directory-service
 import {BehaviorSubject, Observable, Subject} from 'rxjs';
 import {Configuration, PreferencesService} from './preferences.service';
 import {map} from 'rxjs/operators';
+import {CommandListenerService} from './commands/command-listener';
 
 
 export interface AppStatus {
@@ -46,7 +47,7 @@ export class CommandCenterService {
   };
 
   private rootListChanged = new BehaviorSubject<McRootFolder[]>([]);
-
+  private keyCommandListChanges = new BehaviorSubject<{ [key: string]: string }>({});
 
   onDirectoryChanged(name: FolderListName): Observable<McDir> {
     return this.directoryEventSource[name].directoryChanged.asObservable();
@@ -69,16 +70,19 @@ export class CommandCenterService {
     return this.rootListChanged.asObservable();
   }
 
+  get OnKeyCommandListChanged(): Observable<{ [key: string]: string }> {
+    return this.keyCommandListChanges.asObservable();
+  }
 
 
-  constructor(private directoryService: DirectoryService, private preferencesService: PreferencesService) {
+  constructor(private directoryService: DirectoryService, private preferencesService: PreferencesService, private commandListenerService: CommandListenerService) {
   }
 
   prepare(): AppStatus | Observable<AppStatus> {
     if (this.appStatus !== undefined) return this.appStatus;
 
     return this.preferencesService.getPreferences().pipe(
-      map(p => this.prepareAppStatus(p))
+      map(p => this.prepareAppStatus(p)),
     );
   }
 
@@ -101,6 +105,8 @@ export class CommandCenterService {
     this.refreshRootList();
 
     this.requestFocus("left");
+
+    this.notifyPreferencesChanges(conf);
 
     return this.appStatus;
   }
@@ -169,5 +175,17 @@ export class CommandCenterService {
     }
     this.refreshDirectoryList(name);
     this.directoryEventSource[name].directoryChanged.next(currentRootDir);
+  }
+
+  notifyPreferencesChanges(conf: Configuration) {
+    this.keyCommandListChanges.next(conf.keyCommand);
+  }
+
+  canExecuteCommand(command: string) {
+    return this.commandListenerService.canExecuteCommand(this,command);
+  }
+
+  doExecuteCommand(command: string) {
+    return this.commandListenerService.doExecuteCommand(this,command);
   }
 }

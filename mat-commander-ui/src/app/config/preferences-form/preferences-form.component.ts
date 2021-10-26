@@ -21,7 +21,9 @@ export class PreferencesFormComponent implements OnInit {
 
   private configuration: Configuration = {
     left_dir: {rootFolder:{name:"",type:"", separator: "/"}} ,
-    right_dir: {rootFolder:{name:"",type:"", separator: "/"}} };
+    right_dir: {rootFolder:{name:"",type:"", separator: "/"}},
+    keyCommand: {}
+  };
 
   rootList$: Observable<McRootFolder[]>;
 
@@ -54,6 +56,8 @@ export class PreferencesFormComponent implements OnInit {
         rememberLastUsedFolders: conf.rememberLastUsedFolders,
       }
     )
+
+    this.ccs.notifyPreferencesChanges(conf);
   }
 
   compareByName(o1: any, o2: any): boolean {

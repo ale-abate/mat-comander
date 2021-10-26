@@ -7,6 +7,7 @@ export interface Configuration {
   left_dir: McDir;
   right_dir: McDir;
   rememberLastUsedFolders?: boolean;
+  keyCommand: { [key: string]: string };
 }
 
 

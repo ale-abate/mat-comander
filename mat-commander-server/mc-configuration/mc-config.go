@@ -15,6 +15,8 @@ type Configuration struct {
 	LeftDir                 mc_local_file_system.McDir `json:"left_dir"`
 	RightDir                mc_local_file_system.McDir `json:"right_dir"`
 	RememberLastUsedFolders bool                       `json:"rememberLastUsedFolders"`
+
+	KeyCommandBinding map[string]string `json:"keyCommand"`
 }
 
 func GetConfigPreferences(w http.ResponseWriter, _ *http.Request) {
@@ -47,6 +49,7 @@ func GetConfigPreferences(w http.ResponseWriter, _ *http.Request) {
 			LeftDir:                 defDir,
 			RightDir:                defDir,
 			RememberLastUsedFolders: true,
+			KeyCommandBinding:       createDefaultKeyMap(),
 		}
 
 		w.Header().Set("Content-Type", "application/json")
@@ -60,6 +63,10 @@ func GetConfigPreferences(w http.ResponseWriter, _ *http.Request) {
 
 		conf.LeftDir.File = mc_local_file_system.MapStringPathToMcFile(conf.LeftDir.Root, conf.LeftDir.Path)
 		conf.RightDir.File = mc_local_file_system.MapStringPathToMcFile(conf.RightDir.Root, conf.RightDir.Path)
+
+		if conf.KeyCommandBinding == nil || len(conf.KeyCommandBinding) == 0 {
+			conf.KeyCommandBinding = createDefaultKeyMap()
+		}
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(conf)
@@ -86,4 +93,12 @@ func UpdateConfigPreferences(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(conf)
+}
+
+func createDefaultKeyMap() map[string]string {
+	keys := make(map[string]string)
+
+	keys["F5"] = "copy"
+
+	return keys
 }
