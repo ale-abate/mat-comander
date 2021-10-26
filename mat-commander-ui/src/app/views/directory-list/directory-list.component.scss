@@ -30,7 +30,7 @@ div.folder-active  table .mat-header-cell  {
 
 
 
-.file-active   {
+.rowFocused  {
   background-color: mat.get-color-from-palette($my-palette, 400);
 
   td {
@@ -38,9 +38,23 @@ div.folder-active  table .mat-header-cell  {
   }
 }
 
+.selectedFile   {
 
-
-
-.file-not-active   {
-  background-color: unset;
+  td {
+    border-top-style: dashed;
+    border-bottom-style: dashed;
+    border-width: 2px;
+    border-color: brown;
+  }
+  td:first-child {
+    border-left-style: dashed;
+  }
+  td:last-child {
+    border-right-style: dashed;
+  }
 }
+
+
+
+
+

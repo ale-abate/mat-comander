@@ -54,6 +54,8 @@ export class CommandListenerService implements OnDestroy {
   }
 
   processKeyboardEvent( ccs: CommandCenterService, event: KeyboardEvent, supportedCommands: string[]) {
+    console.log('KEY: ', event.key);
+
     if( this.keyCommands[event.key] )  {
       const commandName = this.keyCommands[event.key];
       if(  supportedCommands.includes(commandName)) {

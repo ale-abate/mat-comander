@@ -28,7 +28,8 @@
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns; let ix = index"
-        [class]="isFileSelected(row,ix) ? 'file-active' : 'file-not-active'"
+        [class.selectedFile]="isFileSelected(row,ix)"
+        [class.rowFocused]="isRowSelected(row,ix)"
         (click)="selectRow($event,row,ix)"
     ></tr>
   </table>

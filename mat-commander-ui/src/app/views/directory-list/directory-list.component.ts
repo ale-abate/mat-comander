@@ -26,6 +26,8 @@ export class DirectoryListComponent implements   AfterViewInit, OnDestroy , OnIn
 
   active$: Observable<boolean> = of(false);
   selection: SelectionModel<McFile> = new SelectionModel<McFile>(true, []);
+  focusedRow: SelectionModel<McFile> = new SelectionModel<McFile>(false, []);
+
   private currentRootDir?: McDir = undefined;
 
   constructor(private ccs: CommandCenterService) {
@@ -41,14 +43,14 @@ export class DirectoryListComponent implements   AfterViewInit, OnDestroy , OnIn
       .subscribe(
         dir => {
           this.refresh()
-          this.selection.clear();
           this.ccs.notifySelection(this.name, []);
           this.currentRootDir = dir;
         }
       );
     this.ccs.OnContentDirectoryChanged(this.name).subscribe(
       f => {
-        this.dataSource.refresh(f)
+        this.dataSource.refresh(f);
+        this.clearSelection();
       }
     );
 
@@ -60,6 +62,7 @@ export class DirectoryListComponent implements   AfterViewInit, OnDestroy , OnIn
 
   refresh() {
     this.ccs.refreshDirectoryList(this.name);
+    this.clearSelection();
   }
 
   ngOnDestroy(): void {
@@ -93,16 +96,37 @@ export class DirectoryListComponent implements   AfterViewInit, OnDestroy , OnIn
   private doSelection(row: McFile, ix: number, multiple: boolean) {
     if(multiple) {
       this.selection.toggle(row);
+      this.focusedRow.select(row)
     } else {
+      this.focusedRow.select(row)
       this.selection.clear();
       this.selection.select(row);
     }
 
     console.log(this.selection.selected);
-    this.ccs.notifySelection(this.name, this.selection.selected);
+
+    if(this.selection.isEmpty()){
+      if(this.focusedRow.isEmpty()){
+        this.ccs.notifySelection(this.name, []);
+      } else {
+        this.ccs.notifySelection(this.name, this.focusedRow.selected);
+      }
+    } else {
+      this.ccs.notifySelection(this.name, this.selection.selected);
+    }
   }
 
   isFileSelected(row: McFile, ix: number) {
     return this.selection.isSelected(row);
+  }
+
+  isRowSelected(row: McFile, ix: number) {
+    return this.focusedRow.isSelected(row);
+  }
+
+  private clearSelection() {
+    this.focusedRow.clear();
+    this.selection.clear();
+    this.ccs.notifySelection(this.name, []);
   }
 }
