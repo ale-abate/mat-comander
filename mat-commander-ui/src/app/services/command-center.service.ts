@@ -4,10 +4,12 @@ import {BehaviorSubject, Observable, Subject} from 'rxjs';
 import {Configuration, PreferencesService} from './preferences.service';
 import {map} from 'rxjs/operators';
 import {CommandListenerService} from './commands/command-listener';
+import {MatDialog} from '@angular/material/dialog';
+import {ComponentType} from '@angular/cdk/portal';
 
 
 export interface AppStatus {
-  currentName?: string;
+  currentName?: 'left'| 'right';
   currentDir?: McDir;
   currentLeftDir?: McDir;
   currentRightDir?: McDir;
@@ -18,7 +20,7 @@ interface DirectoryEventSource {
   directoryChanged: Subject<McDir>;
   directoryContentChanged: Subject<McFile[]>,
   directoryFocusChanged: Subject<boolean>,
-  directorySelectionChanged: Subject<McFile[]>,
+  directorySelectionChanged: BehaviorSubject<McFile[]>,
 }
 
 export type FolderListName =  'left'| 'right';
@@ -36,13 +38,13 @@ export class CommandCenterService {
       directoryChanged: new BehaviorSubject<McDir>(<McDir>this.appStatus?.currentLeftDir),
       directoryContentChanged: new Subject<McFile[]>(),
       directoryFocusChanged: new BehaviorSubject<boolean>(false),
-      directorySelectionChanged: new Subject<McFile[]>(),
+      directorySelectionChanged: new BehaviorSubject<McFile[]>([]),
     },
     "right": {
       directoryChanged: new BehaviorSubject<McDir>(<McDir>this.appStatus?.currentLeftDir),
       directoryContentChanged: new Subject<McFile[]>(),
       directoryFocusChanged: new BehaviorSubject<boolean>(false),
-      directorySelectionChanged: new Subject<McFile[]>(),
+      directorySelectionChanged: new BehaviorSubject<McFile[]>([]),
     },
   };
 
@@ -75,7 +77,8 @@ export class CommandCenterService {
   }
 
 
-  constructor(private directoryService: DirectoryService, private preferencesService: PreferencesService, private commandListenerService: CommandListenerService) {
+  constructor(private directoryService: DirectoryService, private preferencesService: PreferencesService, private commandListenerService: CommandListenerService,
+              public dialog: MatDialog) {
   }
 
   prepare(): AppStatus | Observable<AppStatus> {
@@ -135,6 +138,10 @@ export class CommandCenterService {
     return name == "left";
   }
 
+  get AppStatus(): AppStatus {
+    return <AppStatus>this.appStatus;
+  }
+
   requestFocus(name: FolderListName) {
     const left = this.isLeft(name);
     if (this.appStatus) {
@@ -178,6 +185,7 @@ export class CommandCenterService {
   }
 
   notifyPreferencesChanges(conf: Configuration) {
+    this.commandListenerService.setKeyCommands(conf.keyCommand);
     this.keyCommandListChanges.next(conf.keyCommand);
   }
 
@@ -186,6 +194,26 @@ export class CommandCenterService {
   }
 
   doExecuteCommand(command: string) {
+
     return this.commandListenerService.doExecuteCommand(this,command);
+  }
+
+  getCurrentSelection(name : FolderListName) {
+    return this.directoryEventSource[name].directorySelectionChanged.value;
+  }
+
+  public openDialog<T>(component : ComponentType<T>, data: any) {
+
+    this.commandListenerService.saveKeyCommands();
+
+    const ref =  this.dialog.open(component, {restoreFocus: true, data});
+    ref.afterClosed().subscribe(
+        res=> this.commandListenerService.restoreKeyCommands()
+    )
+
+  }
+
+  processKeyboardEvent(event: KeyboardEvent, supportedCommands: string[]) {
+    this.commandListenerService.processKeyboardEvent(this,event, supportedCommands);
   }
 }

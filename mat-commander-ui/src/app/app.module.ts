@@ -30,8 +30,11 @@ import {MatSortModule} from '@angular/material/sort';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {LoaderInterceptor} from './interceptors/loader-interceptor.service';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
+
 import {NgxFilesizeModule} from 'ngx-filesize';
 import {DirToolbarComponent} from './views/dir-toolbar/dir-toolbar.component';
+import {CopyFilesDlgComponent} from './commands/copy-files-dlg/copy-files-dlg.component';
+import {MatDialogModule} from '@angular/material/dialog';
 
 @NgModule({
   declarations: [
@@ -42,7 +45,8 @@ import {DirToolbarComponent} from './views/dir-toolbar/dir-toolbar.component';
     ToolsComponent,
     TwoListsComponent,
     DirectoryListComponent,
-    DirToolbarComponent
+    DirToolbarComponent,
+    CopyFilesDlgComponent
   ],
     imports: [
         BrowserModule,
@@ -67,6 +71,7 @@ import {DirToolbarComponent} from './views/dir-toolbar/dir-toolbar.component';
         MatSortModule,
         MatCheckboxModule,
         MatProgressBarModule,
+        MatDialogModule,
         NgxFilesizeModule,
         FormsModule,
     ],

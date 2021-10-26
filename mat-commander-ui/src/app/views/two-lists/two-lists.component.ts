@@ -3,6 +3,7 @@ import {CommandCenterService, FolderListName} from '../../services/command-cente
 import {ActivatedRoute} from '@angular/router';
 import {Subscription} from 'rxjs';
 import {McFile} from '../../services/directory-service';
+import {CommandListenerService} from '../../services/commands/command-listener';
 
 
 @Component({
@@ -12,7 +13,6 @@ import {McFile} from '../../services/directory-service';
 })
 export class TwoListsComponent implements OnInit, OnDestroy {
   focused?: FolderListName = undefined;
-  private keyCommand: { [key: string]: string } ={};
   private supportedCommands : string[] =  ["copy"];
 
   files:  { [dirSource: string]: McFile[] } = {
@@ -25,24 +25,12 @@ export class TwoListsComponent implements OnInit, OnDestroy {
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
-    if( this.keyCommand[event.key] )  {
-      const commandName = this.keyCommand[event.key];
-      if(  this.supportedCommands.includes(commandName)) {
-        console.log('KEY: ', event.key, " Command: ", commandName);
-
-        if (this.ccs.canExecuteCommand(commandName)) {
-          this.ccs.doExecuteCommand(commandName);
-          event.stopPropagation();
-        }
-
-        event.preventDefault();
-      }
-    }
+    this.ccs.processKeyboardEvent(event,this.supportedCommands);
   }
 
 
   constructor(private route: ActivatedRoute,
-    public ccs: CommandCenterService) {
+    public ccs: CommandCenterService, private commandListener: CommandListenerService) {
 
     this.subscriptions.push(this.ccs.OnDirectoryFocus('right').subscribe(  active =>
       this.focused = active ? 'right' : 'left'
@@ -55,10 +43,7 @@ export class TwoListsComponent implements OnInit, OnDestroy {
       this.files['left'] = files
     ));
 
-    this.subscriptions.push(this.ccs.OnKeyCommandListChanged.subscribe(keyCommand => {
-      console.log("key command" , keyCommand);
-      this.keyCommand = keyCommand;
-    }));
+
 
   }
 
