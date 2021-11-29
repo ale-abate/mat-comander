@@ -3,7 +3,7 @@ import {DirectoryService, McDir, McFile, McRootFolder} from './directory-service
 import {BehaviorSubject, Observable, Subject} from 'rxjs';
 import {Configuration, PreferencesService} from './preferences.service';
 import {map} from 'rxjs/operators';
-import {CommandListenerService} from './commands/command-listener';
+import {CommandListener, CommandListenerService} from './commands/command-listener';
 import {MatDialog} from '@angular/material/dialog';
 import {ComponentType} from '@angular/cdk/portal';
 
@@ -215,5 +215,9 @@ export class CommandCenterService {
 
   processKeyboardEvent(event: KeyboardEvent, supportedCommands: string[]) {
     this.commandListenerService.processKeyboardEvent(this,event, supportedCommands);
+  }
+
+  processLocalKeyboardEvent(event: KeyboardEvent, supportedCommands: string[], listener: CommandListener):boolean {
+    return this.commandListenerService.processLocalKeyboardEvent(this,event, supportedCommands, listener);
   }
 }

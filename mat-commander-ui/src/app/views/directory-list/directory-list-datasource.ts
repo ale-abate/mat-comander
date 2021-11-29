@@ -67,6 +67,10 @@ export class DirectoryListDataSource extends DataSource<McFile> {
   refresh(f: McFile[]) {
     this.dirListSubject.next(this.getSortedData(f));
   }
+
+  getCurrentData():McFile[] {
+    return this.dirListSubject.value;
+  }
 }
 
 /** Simple sort comparator for example ID/Name columns (for client-side sorting). */

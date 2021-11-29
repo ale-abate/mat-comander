@@ -10,11 +10,11 @@ export class CopyCommandService implements CommandListener {
   constructor() {
   }
 
-  canExecute(ccs: CommandCenterService): boolean {
+  canExecute(ccs: CommandCenterService, command: string): boolean {
     return true;
   }
 
-  doExecuteCommand(ccs: CommandCenterService): boolean {
+  doExecuteCommand(ccs: CommandCenterService, command: string): boolean {
     console.log('COPY CMD');
     const pars: CopyFilesPars = {side: <FolderListName>ccs.AppStatus.currentName, selection:[]};
 

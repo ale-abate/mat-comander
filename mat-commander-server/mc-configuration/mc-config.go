@@ -98,6 +98,7 @@ func UpdateConfigPreferences(w http.ResponseWriter, r *http.Request) {
 func createDefaultKeyMap() map[string]string {
 	keys := make(map[string]string)
 
+	keys["Enter"] = "action"
 	keys["F3"] = "view"
 	keys["F4"] = "edit"
 	keys["F5"] = "copy"
@@ -108,6 +109,9 @@ func createDefaultKeyMap() map[string]string {
 	keys["ArrowUp"] = "select_up"
 	keys["ArrowDown"] = "select_down"
 	keys["Tab"] = "switch_panel"
+
+	keys["ArrowUp"] = "up"
+	keys["ArrowDown"] = "down"
 
 	return keys
 }

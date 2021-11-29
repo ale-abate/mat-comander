@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, HostListener, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {MatSort} from '@angular/material/sort';
 import {MatTable} from '@angular/material/table';
 import {McDir, McFile} from '../../services/directory-service';
@@ -6,22 +6,36 @@ import {DirectoryListDataSource} from './directory-list-datasource';
 import {CommandCenterService, FolderListName} from '../../services/command-center.service';
 import {Observable, of} from 'rxjs';
 import {SelectionModel} from '@angular/cdk/collections';
+import {CommandListener} from '../../services/commands/command-listener';
 
 @Component({
   selector: 'app-directory-list',
   templateUrl: './directory-list.component.html',
   styleUrls: ['./directory-list.component.scss']
 })
-export class DirectoryListComponent implements   AfterViewInit, OnDestroy , OnInit{
+export class DirectoryListComponent implements AfterViewInit, OnDestroy, OnInit, CommandListener {
+
+  private supportedLocalCommands: string[] = ["toggle_selection", "select_up", "select_down", "up", "down", "action"];
+  private supportedGlobalCommands: string[] = [];
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+
+    const currentPanel = this.ccs.AppStatus.currentName === this.name;
+
+
+    if (currentPanel && !this.ccs.processLocalKeyboardEvent(event, this.supportedLocalCommands, this)) {
+      this.ccs.processKeyboardEvent(event, this.supportedGlobalCommands);
+    }
+
+  }
 
   @Input('name') name: FolderListName = "left";
-
-
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatTable) table!: MatTable<McFile>;
   dataSource: DirectoryListDataSource;
 
-  displayedColumns = ['name', 'ext','time','size', ];
+  displayedColumns = ['name', 'ext', 'time', 'size',];
 
 
   active$: Observable<boolean> = of(false);
@@ -31,7 +45,6 @@ export class DirectoryListComponent implements   AfterViewInit, OnDestroy , OnIn
   private currentRootDir?: McDir = undefined;
 
   constructor(private ccs: CommandCenterService) {
-
     this.dataSource = new DirectoryListDataSource();
   }
 
@@ -55,6 +68,7 @@ export class DirectoryListComponent implements   AfterViewInit, OnDestroy , OnIn
     );
 
   }
+
   ngOnInit(): void {
     this.active$ = this.ccs.OnDirectoryFocus(this.name);
   }
@@ -74,27 +88,28 @@ export class DirectoryListComponent implements   AfterViewInit, OnDestroy , OnIn
 
 
   private watchDouble: number = 0;
+
   selectRow($event: MouseEvent, row: McFile, ix: number) {
     this.watchDouble += 1;
-    setTimeout(()=>{
+    setTimeout(() => {
       if (this.watchDouble === 1) {
         this.doSelection(row, ix, $event.ctrlKey);
       } else if (this.watchDouble === 2) {
         this.doAction(row, ix);
       }
       this.watchDouble = 0
-    },200);
+    }, 200);
   }
 
 
   private doAction(row: McFile, ix: number) {
-    if(this.currentRootDir) {
+    if (this.currentRootDir) {
       this.ccs.doAction(this.name, this.currentRootDir, row);
     }
   }
 
   private doSelection(row: McFile, ix: number, multiple: boolean) {
-    if(multiple) {
+    if (multiple) {
       this.selection.toggle(row);
       this.focusedRow.select(row)
     } else {
@@ -105,8 +120,8 @@ export class DirectoryListComponent implements   AfterViewInit, OnDestroy , OnIn
 
     console.log(this.selection.selected);
 
-    if(this.selection.isEmpty()){
-      if(this.focusedRow.isEmpty()){
+    if (this.selection.isEmpty()) {
+      if (this.focusedRow.isEmpty()) {
         this.ccs.notifySelection(this.name, []);
       } else {
         this.ccs.notifySelection(this.name, this.focusedRow.selected);
@@ -128,5 +143,76 @@ export class DirectoryListComponent implements   AfterViewInit, OnDestroy , OnIn
     this.focusedRow.clear();
     this.selection.clear();
     this.ccs.notifySelection(this.name, []);
+  }
+
+
+  canExecute(ccs: CommandCenterService, command: string): boolean {
+    return true;
+  }
+
+  doExecuteCommand(ccs: CommandCenterService, command: string): boolean {
+    if (command == 'toggle_selection') {
+      return this.doToggleSelectionCommand();
+    }
+    if (command == 'up' || command == 'down') {
+      return this.doUpDown(command);
+    }
+    if (command == 'action' ) {
+      return this.doActionByKey();
+    }
+
+
+    return false;
+  }
+
+
+  private doToggleSelectionCommand(): boolean {
+    const current = this.focusedRow.selected;
+    if (current && current.length > 0) {
+      this.selection.toggle(current[0]);
+      this.ccs.notifySelection(this.name, this.selection.selected);
+
+      const currentList = this.dataSource.getCurrentData();
+      const index = currentList.findIndex(data => current[0].name + current[0].ext == data.name + data.ext);
+      if (index >= 0) {
+        if (index < currentList.length - 1) {
+          this.focusedRow.select(currentList[index + 1]);
+        }
+      }
+    }
+    return true;
+  }
+
+  private doUpDown(command: string): boolean {
+    const currentList = this.dataSource.getCurrentData();
+    if(currentList.length==0) return true;
+
+
+    const current = this.focusedRow.selected;
+    if (current && current.length > 0) {
+      let index = currentList.findIndex(data => current[0].name + current[0].ext == data.name + data.ext);
+      if(index>=1 && command=='up') index --;
+      if(index<currentList.length-1 && command=='down') index ++;
+      this.focusedRow.select(currentList[index]);
+    } else {
+      this.focusedRow.select(currentList[0]);
+    }
+
+
+    return true;
+  }
+
+  private doActionByKey(): boolean {
+    const current = this.focusedRow.selected;
+    const currentList = this.dataSource.getCurrentData();
+    const index = currentList.findIndex(data => current[0].name + current[0].ext == data.name + data.ext);
+
+    console.log('action',current,index)
+
+
+    if(index!= -1 && current && current[0])
+        this.doAction(current[0],index);
+
+    return true;
   }
 }

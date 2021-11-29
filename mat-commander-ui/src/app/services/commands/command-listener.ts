@@ -3,9 +3,10 @@ import {Subscription} from 'rxjs';
 import {CommandCenterService} from '../command-center.service';
 import {CopyCommandService} from './copy-command-service';
 
+
 export interface CommandListener {
-  canExecute(ccs: CommandCenterService): boolean;
-  doExecuteCommand(ccs: CommandCenterService): boolean;
+  canExecute(ccs: CommandCenterService, command: string): boolean;
+  doExecuteCommand(ccs: CommandCenterService, command: string): boolean;
 }
 
 
@@ -19,7 +20,7 @@ export class CommandListenerService implements OnDestroy {
 
 
   private commands: {[key: string] : CommandListener} = {
-      'copy' : new CopyCommandService()
+      'copy' : new CopyCommandService(),
   }
   private subscriptions: Subscription[] =[];
   private savedKeyCommands: { [p: string]: string } = {};
@@ -41,20 +42,20 @@ export class CommandListenerService implements OnDestroy {
       console.error('COMMAND ' + command + ' not found');
       return false;
     } else {
-      return cmd.canExecute(ccs);
+      return cmd.canExecute(ccs, command);
     }
   }
 
   doExecuteCommand(ccs: CommandCenterService,command: string) {
     if(this.canExecuteCommand(ccs,command)) {
-      return this.commands[command].doExecuteCommand(ccs);
+      return this.commands[command].doExecuteCommand(ccs,command);
     } else {
       return false;
     }
   }
 
   processKeyboardEvent( ccs: CommandCenterService, event: KeyboardEvent, supportedCommands: string[]) {
-    console.log('KEY: ', event.key);
+    console.log('Global KEY: ', event.key);
 
     if( this.keyCommands[event.key] )  {
       const commandName = this.keyCommands[event.key];
@@ -69,7 +70,20 @@ export class CommandListenerService implements OnDestroy {
         event.preventDefault();
       }
     }
+  }
 
+  processLocalKeyboardEvent(ccs: CommandCenterService, event: KeyboardEvent, supportedCommands: string[], listener: CommandListener) {
+    console.log('LOCAL KEY: ', event.key);
+    const commandName = this.keyCommands[event.key];
+    if(  supportedCommands.includes(commandName)) {
+      if (listener.canExecute(ccs,commandName)) {
+        listener.doExecuteCommand(ccs,commandName);
+        event.stopPropagation();
+        event.preventDefault();
+        return true;
+      }
+    }
+    return false;
   }
 
   saveKeyCommands() {
@@ -80,4 +94,6 @@ export class CommandListenerService implements OnDestroy {
   restoreKeyCommands() {
     this.keyCommands = this.savedKeyCommands;
   }
+
+
 }

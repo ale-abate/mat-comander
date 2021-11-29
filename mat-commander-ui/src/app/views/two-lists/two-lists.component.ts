@@ -3,7 +3,7 @@ import {CommandCenterService, FolderListName} from '../../services/command-cente
 import {ActivatedRoute} from '@angular/router';
 import {Subscription} from 'rxjs';
 import {McFile} from '../../services/directory-service';
-import {CommandListenerService} from '../../services/commands/command-listener';
+import {CommandListener, CommandListenerService} from '../../services/commands/command-listener';
 
 
 @Component({
@@ -11,9 +11,12 @@ import {CommandListenerService} from '../../services/commands/command-listener';
   templateUrl: './two-lists.component.html',
   styleUrls: ['./two-lists.component.scss']
 })
-export class TwoListsComponent implements OnInit, OnDestroy {
+export class TwoListsComponent implements OnInit, OnDestroy , CommandListener{
   focused?: FolderListName = undefined;
-  private supportedCommands : string[] =  ["copy"];
+
+  private supportedLocalCommands: string[] = ["switch_panel"];
+  private supportedGlobalCommands: string[] = ["copy"];
+
 
   files:  { [dirSource: string]: McFile[] } = {
       "right" : [],
@@ -25,7 +28,9 @@ export class TwoListsComponent implements OnInit, OnDestroy {
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
-    this.ccs.processKeyboardEvent(event,this.supportedCommands);
+    if(!this.ccs.processLocalKeyboardEvent(event,this.supportedLocalCommands, this)) {
+      this.ccs.processKeyboardEvent(event,this.supportedGlobalCommands);
+    }
   }
 
 
@@ -57,6 +62,18 @@ export class TwoListsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscriptions.forEach(s => s.unsubscribe());
+  }
+
+  canExecute(ccs: CommandCenterService, command: string): boolean {
+    return true;
+  }
+
+  doExecuteCommand(ccs: CommandCenterService, command: string): boolean {
+    if( command=='switch_panel') {
+      const panel = ccs.AppStatus.currentName === 'right' ? 'left' : 'right'
+      this.ccs.requestFocus(panel);
+    }
+    return true;
   }
 
 
