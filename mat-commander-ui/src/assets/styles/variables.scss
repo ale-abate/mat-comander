@@ -1,6 +1,24 @@
+@use 'sass:map';
+@use '~@angular/material' as mat;
+@import "~@angular/material/theming";
+
+@include mat-core();
+
 $top-bar-size: 50px;
 $progress-bar-size: 5px;
 $button-bar-size: 30px;
 $bottom-bar-size: 30px;
 
+
+
+$primaryPalette: mat-palette($mat-indigo);
+$accentPalette:  mat-palette($mat-pink, A200, A100, A400);
+
+// the default warn palette is red, so use that if the theme doesn't define one
+$warnPalette:    mat-palette($mat-red);
+
+
+$file-label-background :  mat.get-color-from-palette($mat-indigo , 200);
+
+$file-label-color :  mat.get-contrast-color-from-palette($mat-indigo , 200);
 

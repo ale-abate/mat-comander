@@ -3,6 +3,14 @@
 
 mat-toolbar {
   height: $button-bar-size - 1px;
-  font-size: .8em;
 }
 
+.file-path {
+  font-size: 12px;
+}
+
+
+.root-selector {
+  width:60px;
+  font-size: 12px;
+}

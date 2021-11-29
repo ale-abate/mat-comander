@@ -35,6 +35,7 @@ import {NgxFilesizeModule} from 'ngx-filesize';
 import {DirToolbarComponent} from './views/dir-toolbar/dir-toolbar.component';
 import {CopyFilesDlgComponent} from './commands/copy-files-dlg/copy-files-dlg.component';
 import {MatDialogModule} from '@angular/material/dialog';
+import {MatChipsModule} from '@angular/material/chips';
 
 @NgModule({
   declarations: [
@@ -71,6 +72,7 @@ import {MatDialogModule} from '@angular/material/dialog';
         MatSortModule,
         MatCheckboxModule,
         MatProgressBarModule,
+        MatChipsModule,
         MatDialogModule,
         NgxFilesizeModule,
         FormsModule,

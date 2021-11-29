@@ -24,18 +24,7 @@
     <button mat-icon-button>
       <mat-icon>search</mat-icon>
     </button>
-
-    {{focused}}
-
-    {{files['left'].length}} ||
-
-     {{files['right'].length}}
-
-
   </div>
-
-
-
 
 
   <div class="right-col">
@@ -44,6 +33,30 @@
 </div>
 
 
-<mat-toolbar class="bottom-bar">xxx</mat-toolbar>
+<mat-toolbar class="bottom-bar">
+
+  <ng-container *ngIf = "focused!=null"   >
+    <div class="file-label-container" >
+
+      <span *ngFor="let file of files[focused]" >
+        {{file.name}}<ng-container *ngIf="!file.dir">.{{file.ext}}</ng-container>
+      </span>
+
+
+
+    </div>
+    <span class="global-spacer"></span>
+    <div class="file-counter-container" >
+
+      <span *ngIf="files[focused].length>0" > {{files[focused].length}} Files</span>
+
+
+      <span  *ngIf="files[focused].length>0" > {{ calcBytes() | filesize }}</span>
+
+    </div>
+  </ng-container>
+
+
+</mat-toolbar>
 
 

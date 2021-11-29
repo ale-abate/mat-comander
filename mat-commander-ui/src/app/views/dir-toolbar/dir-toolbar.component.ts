@@ -47,41 +47,46 @@ export class DirToolbarComponent implements OnInit, OnDestroy {
 
   private onDirectoryChanged(dir: McDir) {
     this.selectedRoot = dir.rootFolder;
-    console.log('dc',this.name, JSON.stringify(dir), dir.rootFolder.separator);
+    console.log('dc',this.name, dir.rootFolder.separator, JSON.stringify(dir));
     this.pathParts=   dir.path?.split(dir.rootFolder.separator) as string[];
   }
 
-
-  clickPathPart(part: string, ix: number) {
-    let newPath ="";
+  private extractPathFilter(ix: number) {
+    let newPath = "";
     let sep = "";
-    this.pathParts.filter((p,arrIx) => arrIx<= ix).
-      forEach(  (p,ix) => {
-      newPath += sep + p; sep ="/";
-    } );
+    this.pathParts.filter((p, arrIx) => arrIx <= ix).forEach((p, ix) => {
+      newPath += sep + p;
+      sep = this.selectedRoot.separator;
+    });
+    return newPath;
+
+  }
 
 
+  clickPathSeparatorPart(part: string, ix: number) {
+    const newPath = this.extractPathFilter(ix);
+    const filter: McDirFilter = {
+      path: newPath,
+      onlyDirs: true
+    };
 
     this.subDirs = [];
-
-    const filter : McDirFilter = {
-      path: newPath,
-      onlyDirs: true };
-
-    console.log('parts: ' , filter)
-
     this.ds.listDir(filter).subscribe(
       d => this.subDirs = d
     );
 
+  }
 
 
-    /*
-    const dir: McDir = {path: this.newPath, rootFolder: this.selectedRoot};
 
-      this.ccs.doChangePath( this.name,
-        dir);
+  changeFolder(subDir: McFile, ix: number) {
+    const path = this.extractPathFilter(ix);
+    let dir:McDir = {rootFolder: this.selectedRoot, path, file: subDir};
+    this.ccs.doAction( this.name, dir, subDir);
+  }
 
-     */
+  changeFolderByPart(s: string, ix: number) {
+    const subDir: McFile = {name: '',dir:true}
+    this.changeFolder(subDir,ix);
   }
 }

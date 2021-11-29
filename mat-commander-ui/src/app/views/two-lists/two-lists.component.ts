@@ -77,4 +77,7 @@ export class TwoListsComponent implements OnInit, OnDestroy , CommandListener{
   }
 
 
+  calcBytes(): number {
+    return <number>this.files[ '' + this.focused].map(f => f.size !== undefined ? f.size : 0).reduce((p, c) => p + c, 0);
+  }
 }

@@ -1,6 +1,7 @@
 @use "sass:math";
 @import '../../../assets/styles/variables.scss';
 
+
 $center-col-width: 4%;
 $pad-col: 0.4em;
 
@@ -57,4 +58,28 @@ $pad-col: 0.4em;
   bottom: 0;
   z-index: 1;
   height: $bottom-bar-size;
+
+  font-size: 0.8em;
+
+
+  .file-label-container {
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    span {
+      background-color:  $file-label-background;
+      color:  $file-label-color;
+      padding: 3px;
+      border-radius: 7px;
+      margin-left: 2px;
+      margin-right: 2px;
+    }
+
+  }
+
+}
+
+
+.file-counter-container {
+  margin-left: 5px;
 }

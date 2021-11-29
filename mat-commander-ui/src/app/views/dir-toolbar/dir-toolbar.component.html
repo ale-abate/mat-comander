@@ -3,7 +3,7 @@
 
   <mat-select [compareWith]="compareByName" [value]="selectedRoot"
               (selectionChange)="doRootSelectionChange($event)"
-              style="width:60px;">
+              class="root-selector">
     <mat-select-trigger>
       <img src="/assets/icons/mount/{{selectedRoot?.type}}.svg" width="24px"  style="vertical-align:middle">
       {{selectedRoot.name}}
@@ -23,11 +23,11 @@
   <span class="global-spacer"></span>
   <span *ngFor="let s of pathParts; let ix = index">
     <ng-container>
-        <span>{{s}}</span>
+      <span class="file-path" (click)="changeFolderByPart(s,ix)">{{s}}</span>
 
         <button mat-icon-button *ngIf="ix<pathParts.length-1"
                 aria-label="Show sibling folders"
-                (click)="clickPathPart(s,ix)" [matMenuTriggerFor]="directoryMenu"
+                (click)="clickPathSeparatorPart(s,ix)" [matMenuTriggerFor]="directoryMenu"
         >
          <mat-icon style="vertical-align:middle">arrow_drop_down</mat-icon>
 
@@ -35,7 +35,7 @@
 
         <mat-menu #directoryMenu="matMenu">
 
-          <button mat-menu-item *ngFor="let dir of subDirs">
+          <button mat-menu-item *ngFor="let dir of subDirs"  (click)="changeFolder(dir,ix)">
             <img  [src]="'/assets/icons/ext/dir.png'" height="24" />
             <span>{{dir.name}}</span>
           </button>

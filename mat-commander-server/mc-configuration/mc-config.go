@@ -104,6 +104,7 @@ func createDefaultKeyMap() map[string]string {
 	keys["F5"] = "copy"
 	keys["F6"] = "move"
 	keys["F7"] = "make_dir"
+	keys["Delete"] = "delete"
 
 	keys["Insert"] = "toggle_selection"
 	keys["ArrowUp"] = "select_up"

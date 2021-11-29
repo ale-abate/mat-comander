@@ -156,9 +156,9 @@ export class CommandCenterService {
     this.directoryEventSource[name].directorySelectionChanged.next(selectedFiles);
   }
 
-  doAction(name: FolderListName, currentRootDir: McDir, row: McFile) {
-    if(row.dir) {
-      this.doActionChangeDir(currentRootDir, row, name);
+  doAction(name: FolderListName, currentRootDir: McDir, dirFile: McFile) {
+    if(dirFile.dir) {
+      this.doActionChangeDir(currentRootDir, dirFile, name);
     }
   }
 
@@ -172,6 +172,7 @@ export class CommandCenterService {
       currentRootDir.path += currentRootDir.rootFolder.separator + row.name
     }
 
+    console.log("DIR-changed to : " , currentRootDir.path);
 
     if (this.isLeft(name)) {
       // @ts-ignore

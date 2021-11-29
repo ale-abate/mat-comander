@@ -193,11 +193,10 @@ export class DirectoryListComponent implements AfterViewInit, OnDestroy, OnInit,
       let index = currentList.findIndex(data => current[0].name + current[0].ext == data.name + data.ext);
       if(index>=1 && command=='up') index --;
       if(index<currentList.length-1 && command=='down') index ++;
-      this.focusedRow.select(currentList[index]);
+      this.doSelection(currentList[index], index ,false);
     } else {
-      this.focusedRow.select(currentList[0]);
+      this.doSelection(currentList[0], 0 ,false);
     }
-
 
     return true;
   }
