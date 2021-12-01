@@ -169,18 +169,27 @@ export class DirectoryListComponent implements AfterViewInit, OnDestroy, OnInit,
   private doToggleSelectionCommand(): boolean {
     const current = this.focusedRow.selected;
     if (current && current.length > 0) {
-      this.selection.toggle(current[0]);
+
+      if (this.selection.selected.length != 1 || !this.compareFiles(current[0], this.selection.selected[0])) {
+        this.selection.toggle(current[0]);
+      }
+
       this.ccs.notifySelection(this.name, this.selection.selected);
 
       const currentList = this.dataSource.getCurrentData();
-      const index = currentList.findIndex(data => current[0].name + current[0].ext == data.name + data.ext);
+      const index = currentList.findIndex(data => this.compareFiles(current[0], data));
       if (index >= 0) {
         if (index < currentList.length - 1) {
           this.focusedRow.select(currentList[index + 1]);
         }
       }
+
     }
     return true;
+  }
+
+  private compareFiles(file1: McFile, file2: McFile) {
+    return file1.name + file1.ext == file2.name + file2.ext;
   }
 
   private doUpDown(command: string): boolean {
@@ -193,7 +202,13 @@ export class DirectoryListComponent implements AfterViewInit, OnDestroy, OnInit,
       let index = currentList.findIndex(data => current[0].name + current[0].ext == data.name + data.ext);
       if(index>=1 && command=='up') index --;
       if(index<currentList.length-1 && command=='down') index ++;
-      this.doSelection(currentList[index], index ,false);
+
+      if (this.selection.selected.length != 1 || !this.compareFiles(current[0], this.selection.selected[0])) {
+        this.focusedRow.select(currentList[index]);
+      } else {
+        this.doSelection(currentList[index], index ,false);
+      }
+
     } else {
       this.doSelection(currentList[0], 0 ,false);
     }
