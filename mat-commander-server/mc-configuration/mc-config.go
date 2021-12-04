@@ -107,12 +107,14 @@ func createDefaultKeyMap() map[string]string {
 	keys["Delete"] = "delete"
 
 	keys["Insert"] = "toggle_selection"
-	keys["ArrowUp"] = "select_up"
-	keys["ArrowDown"] = "select_down"
 	keys["Tab"] = "switch_panel"
 
-	keys["ArrowUp"] = "up"
-	keys["ArrowDown"] = "down"
+	keys["ArrowUp"] = "select_up"
+	keys["ArrowDown"] = "select_down"
+	keys["Home"] = "scroll_home"
+	keys["End"] = "scroll_end"
+	keys["PageDown"] = "scroll_page_down"
+	keys["PageUp"] = "scroll_page_up"
 
 	return keys
 }

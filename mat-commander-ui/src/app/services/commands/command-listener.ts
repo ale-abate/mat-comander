@@ -4,6 +4,9 @@ import {CommandCenterService} from '../command-center.service';
 import {CopyCommandService} from './copy-command-service';
 
 
+export type CommandName = "toggle_selection" | "select_up" | "select_down" | "scroll_home" | "scroll_end" | "action";
+
+
 export interface CommandListener {
   canExecute(ccs: CommandCenterService, command: string): boolean;
   doExecuteCommand(ccs: CommandCenterService, command: string): boolean;
@@ -73,7 +76,7 @@ export class CommandListenerService implements OnDestroy {
   }
 
   processLocalKeyboardEvent(ccs: CommandCenterService, event: KeyboardEvent, supportedCommands: string[], listener: CommandListener) {
-    console.log('LOCAL KEY: ', event.key);
+    console.log('LOCAL KEY: ', event.key , this.keyCommands[event.key]);
     const commandName = this.keyCommands[event.key];
     if(  supportedCommands.includes(commandName)) {
       if (listener.canExecute(ccs,commandName)) {

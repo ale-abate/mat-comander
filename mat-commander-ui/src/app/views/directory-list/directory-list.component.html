@@ -31,6 +31,9 @@
         [class.selectedFile]="isFileSelected(row,ix)"
         [class.rowFocused]="isRowSelected(row,ix)"
         (click)="selectRow($event,row,ix)"
+
+        [id]="name + '-tr-' +ix"
+
     ></tr>
   </table>
 </div>

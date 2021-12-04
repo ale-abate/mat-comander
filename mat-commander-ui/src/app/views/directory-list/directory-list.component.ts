@@ -1,4 +1,15 @@
-import {AfterViewInit, Component, HostListener, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  HostListener,
+  Input,
+  OnDestroy,
+  OnInit,
+  QueryList,
+  ViewChild,
+  ViewChildren,
+  ViewContainerRef
+} from '@angular/core';
 import {MatSort} from '@angular/material/sort';
 import {MatTable} from '@angular/material/table';
 import {McDir, McFile} from '../../services/directory-service';
@@ -15,8 +26,10 @@ import {CommandListener} from '../../services/commands/command-listener';
 })
 export class DirectoryListComponent implements AfterViewInit, OnDestroy, OnInit, CommandListener {
 
-  private supportedLocalCommands: string[] = ["toggle_selection", "select_up", "select_down", "up", "down", "action"];
+  private supportedLocalCommands: string[] = ["toggle_selection", "select_up", "select_down", "scroll_home" , "scroll_end" ,  "action"];
   private supportedGlobalCommands: string[] = [];
+
+  @ViewChildren('.matrow', { read: ViewContainerRef }) rows: QueryList<ViewContainerRef> | undefined;
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
@@ -37,6 +50,8 @@ export class DirectoryListComponent implements AfterViewInit, OnDestroy, OnInit,
 
   displayedColumns = ['name', 'ext', 'time', 'size',];
 
+  multipleMode = false;
+
 
   active$: Observable<boolean> = of(false);
   selection: SelectionModel<McFile> = new SelectionModel<McFile>(true, []);
@@ -45,6 +60,7 @@ export class DirectoryListComponent implements AfterViewInit, OnDestroy, OnInit,
   private currentRootDir?: McDir = undefined;
 
   constructor(private ccs: CommandCenterService) {
+
     this.dataSource = new DirectoryListDataSource();
   }
 
@@ -112,13 +128,13 @@ export class DirectoryListComponent implements AfterViewInit, OnDestroy, OnInit,
     if (multiple) {
       this.selection.toggle(row);
       this.focusedRow.select(row)
+      this.multipleMode=  true;
     } else {
       this.focusedRow.select(row)
       this.selection.clear();
       this.selection.select(row);
+      this.multipleMode=false;
     }
-
-    console.log(this.selection.selected);
 
     if (this.selection.isEmpty()) {
       if (this.focusedRow.isEmpty()) {
@@ -154,7 +170,8 @@ export class DirectoryListComponent implements AfterViewInit, OnDestroy, OnInit,
     if (command == 'toggle_selection') {
       return this.doToggleSelectionCommand();
     }
-    if (command == 'up' || command == 'down') {
+    if (command == 'select_up' || command == 'select_down' ||
+        command == 'scroll_home' || command == 'scroll_end') {
       return this.doUpDown(command);
     }
     if (command == 'action' ) {
@@ -170,9 +187,11 @@ export class DirectoryListComponent implements AfterViewInit, OnDestroy, OnInit,
     const current = this.focusedRow.selected;
     if (current && current.length > 0) {
 
-      if (this.selection.selected.length != 1 || !this.compareFiles(current[0], this.selection.selected[0])) {
+      if (this.multipleMode) {
         this.selection.toggle(current[0]);
       }
+
+      this.multipleMode = true;
 
       this.ccs.notifySelection(this.name, this.selection.selected);
 
@@ -183,8 +202,8 @@ export class DirectoryListComponent implements AfterViewInit, OnDestroy, OnInit,
           this.focusedRow.select(currentList[index + 1]);
         }
       }
-
     }
+
     return true;
   }
 
@@ -200,14 +219,18 @@ export class DirectoryListComponent implements AfterViewInit, OnDestroy, OnInit,
     const current = this.focusedRow.selected;
     if (current && current.length > 0) {
       let index = currentList.findIndex(data => current[0].name + current[0].ext == data.name + data.ext);
-      if(index>=1 && command=='up') index --;
-      if(index<currentList.length-1 && command=='down') index ++;
+      if(index>=1 && command=='select_up') index --;
+      if(index<currentList.length-1 && command=='select_down') index ++;
+      if(command=='scroll_home') index = 0;
+      if(command=='scroll_end') index =currentList.length-1;
 
-      if (this.selection.selected.length != 1 || !this.compareFiles(current[0], this.selection.selected[0])) {
+
+      if (this.multipleMode) {
         this.focusedRow.select(currentList[index]);
       } else {
         this.doSelection(currentList[index], index ,false);
       }
+      this.scrollIfNecessary(index);
 
     } else {
       this.doSelection(currentList[0], 0 ,false);
@@ -216,17 +239,35 @@ export class DirectoryListComponent implements AfterViewInit, OnDestroy, OnInit,
     return true;
   }
 
+
+
   private doActionByKey(): boolean {
     const current = this.focusedRow.selected;
     const currentList = this.dataSource.getCurrentData();
     const index = currentList.findIndex(data => current[0].name + current[0].ext == data.name + data.ext);
-
-    console.log('action',current,index)
-
 
     if(index!= -1 && current && current[0])
         this.doAction(current[0],index);
 
     return true;
   }
+
+  private scrollIfNecessary(index: number) {
+    const id = this.name + '-tr-' + index;
+ ;
+    let row = document.getElementById(id);
+    let container = document.getElementById(this.name + "-col");
+
+    // @ts-ignore
+    let rect = row.getBoundingClientRect();
+    // @ts-ignore
+    const height = container.getBoundingClientRect().height
+
+    if ((rect.y <= 0) || ((rect.y+rect.height) > height))
+    {
+      // @ts-ignore
+      row.scrollIntoView(false, {behavior: 'smooth'});
+    }
+  }
+
 }
